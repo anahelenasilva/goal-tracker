@@ -8,6 +8,7 @@ import { GoalEntry } from './entities/goal-entry.entity';
 import { Goal } from './entities/goal.entity';
 import { User } from './entities/user.entity';
 import { GoalsModule } from './modules/goals/goals.module';
+import { HealthModule } from './modules/health/health.module';
 
 @Module({
   imports: [
@@ -22,9 +23,12 @@ import { GoalsModule } from './modules/goals/goals.module';
       password: process.env.DATABASE_PASSWORD || 'postgres',
       database: process.env.DATABASE_NAME || 'goal_tracker',
       entities: [User, Goal, GoalEntry],
-      synchronize: true, // Only for development! Set to false in production
+      migrations: ['dist/src/migrations/*.js'],
+      synchronize: process.env.NODE_ENV !== 'production', // Only for development
+      migrationsRun: process.env.NODE_ENV === 'production', // Run migrations automatically in production
     }),
     GoalsModule,
+    HealthModule,
     DatabaseModule,
   ],
   controllers: [AppController],
