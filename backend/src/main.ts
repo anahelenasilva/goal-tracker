@@ -8,11 +8,11 @@ async function bootstrap() {
 
   // Enable CORS for frontend
   const corsOrigins = process.env.CORS_ORIGINS
-    ? process.env.CORS_ORIGINS.split(',')
+    ? process.env.CORS_ORIGINS.split(',').filter(Boolean)
     : ['http://localhost:5173'];
 
   app.enableCors({
-    origin: corsOrigins,
+    origin: corsOrigins.length > 0 ? corsOrigins : true,
     credentials: true,
   });
 
