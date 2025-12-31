@@ -1,6 +1,6 @@
 # Goal Tracker 2026
 
-A simple and modern web application to track your daily goals for 2026. Built with NestJS backend, React + Vite frontend, PostgreSQL database, and styled with Tailwind CSS.
+A simple and modern web application to track my daily goals for 2026. Built with NestJS backend, React + Vite frontend, PostgreSQL database, and styled with Tailwind CSS.
 
 ## Features
 
