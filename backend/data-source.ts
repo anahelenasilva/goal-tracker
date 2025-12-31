@@ -1,7 +1,11 @@
+import { config } from 'dotenv';
 import { DataSource } from 'typeorm';
 import { GoalEntry } from './src/entities/goal-entry.entity';
 import { Goal } from './src/entities/goal.entity';
 import { User } from './src/entities/user.entity';
+
+// Load environment variables from .env file
+config();
 
 export const AppDataSource = new DataSource({
   type: 'postgres',
@@ -11,6 +15,6 @@ export const AppDataSource = new DataSource({
   password: process.env.DATABASE_PASSWORD || 'postgres',
   database: process.env.DATABASE_NAME || 'goal_tracker',
   entities: [User, Goal, GoalEntry],
-  migrations: ['src/migrations/*.ts'],
+  migrations: ['dist/src/migrations/*.js'],
   synchronize: false, // Never use synchronize in production
 });
