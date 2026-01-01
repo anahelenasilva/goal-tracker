@@ -28,3 +28,9 @@ coverage/
 *.db
 *.sqlite
 
+# SSL Certificates
+nginx/ssl/
+*.pem
+*.key
+*.crt
+
