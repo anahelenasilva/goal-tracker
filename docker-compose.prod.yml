@@ -42,7 +42,7 @@ services:
     networks:
       - goal-tracker-network
     healthcheck:
-      test: ['CMD', 'wget', '--quiet', '--tries=1', '--spider', 'http://localhost:3000/health']
+      test: ['CMD', 'wget', '--quiet', '--tries=1', '--spider', 'http://127.0.0.1:3000/health']
       interval: 30s
       timeout: 10s
       retries: 3
@@ -62,7 +62,7 @@ services:
     networks:
       - goal-tracker-network
     healthcheck:
-      test: ['CMD', 'wget', '--quiet', '--tries=1', '--spider', 'http://localhost/']
+      test: ['CMD', 'wget', '--quiet', '--tries=1', '--spider', 'http://127.0.0.1/']
       interval: 30s
       timeout: 3s
       retries: 3
@@ -86,7 +86,7 @@ services:
       - goal-tracker-network
     healthcheck:
       # Check nginx itself, not the backend (which might be down)
-      test: ['CMD', 'wget', '--quiet', '--tries=1', '--spider', 'http://localhost/']
+      test: ['CMD', 'wget', '--quiet', '--tries=1', '--spider', 'http://127.0.0.1/']
       interval: 30s
       timeout: 3s
       retries: 3
