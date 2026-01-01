@@ -22,10 +22,31 @@ if [ ! -f "$ENV_FILE" ]; then
         cp env.production.example "$ENV_FILE"
         echo -e "${GREEN}Please edit $ENV_FILE with your configuration before deploying.${NC}"
         exit 1
+    elif [ -f "backend/env.production.example" ]; then
+        cp backend/env.production.example "$ENV_FILE"
+        echo -e "${GREEN}Please edit $ENV_FILE with your configuration before deploying.${NC}"
+        exit 1
     else
         echo -e "${RED}Error: env.production.example not found!${NC}"
         exit 1
     fi
+fi
+
+# Export environment variables from .env.production
+# This ensures variables are available to docker compose
+set -a
+source "$ENV_FILE" 2>/dev/null || {
+    echo -e "${RED}Error: Failed to load $ENV_FILE. Check file format.${NC}"
+    echo -e "${YELLOW}Make sure the file uses KEY=value format (no spaces around =)${NC}"
+    exit 1
+}
+set +a
+
+# Verify required variables are set
+if [ -z "$DATABASE_USER" ] || [ -z "$DATABASE_PASSWORD" ] || [ -z "$DATABASE_NAME" ]; then
+    echo -e "${RED}Error: Required environment variables are not set!${NC}"
+    echo -e "${YELLOW}Please check $ENV_FILE and ensure DATABASE_USER, DATABASE_PASSWORD, and DATABASE_NAME are set.${NC}"
+    exit 1
 fi
 
 # Functions
@@ -33,24 +54,24 @@ start() {
     echo -e "${GREEN}Starting all services...${NC}"
     docker compose -f "$COMPOSE_FILE" --env-file "$ENV_FILE" up -d --build
     echo -e "${GREEN}Services started!${NC}"
-    docker compose -f "$COMPOSE_FILE" ps
+    docker compose -f "$COMPOSE_FILE" --env-file "$ENV_FILE" ps
 }
 
 stop() {
     echo -e "${YELLOW}Stopping all services...${NC}"
-    docker compose -f "$COMPOSE_FILE" stop
+    docker compose -f "$COMPOSE_FILE" --env-file "$ENV_FILE" stop
     echo -e "${GREEN}Services stopped.${NC}"
 }
 
 restart() {
     echo -e "${YELLOW}Restarting all services...${NC}"
-    docker compose -f "$COMPOSE_FILE" restart
+    docker compose -f "$COMPOSE_FILE" --env-file "$ENV_FILE" restart
     echo -e "${GREEN}Services restarted!${NC}"
 }
 
 logs() {
     echo -e "${GREEN}Showing logs (Ctrl+C to exit)...${NC}"
-    docker compose -f "$COMPOSE_FILE" logs -f
+    docker compose -f "$COMPOSE_FILE" --env-file "$ENV_FILE" logs -f
 }
 
 update() {
@@ -66,7 +87,7 @@ update() {
 
 status() {
     echo -e "${GREEN}Service Status:${NC}"
-    docker compose -f "$COMPOSE_FILE" ps
+    docker compose -f "$COMPOSE_FILE" --env-file "$ENV_FILE" ps
 
     echo -e "\n${GREEN}Health Check:${NC}"
     curl -s http://localhost/health | jq . || echo "Health check endpoint not responding"
