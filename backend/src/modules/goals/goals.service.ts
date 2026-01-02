@@ -51,36 +51,47 @@ export class GoalsService {
     });
   }
 
-  async createEntry(goalId: string): Promise<GoalEntry> {
+  async createEntry(goalId: string, createdAt?: string): Promise<GoalEntry> {
     const goal = await this.findOne(goalId);
 
-    const hasEntryToday = await this.hasEntryForToday(goalId);
+    const entryDate = createdAt ? new Date(createdAt) : new Date();
+    const hasEntryForDate = await this.hasEntryForDate(goalId, entryDate);
 
-    if (hasEntryToday) {
+    if (hasEntryForDate) {
       throw new ConflictException(
-        'An entry for today already exists for this goal',
+        'An entry for this date already exists for this goal',
       );
     }
 
     const entry = this.goalEntriesRepository.create({
       goalId: goal.id,
+      createdAt: entryDate,
     });
 
     return this.goalEntriesRepository.save(entry);
   }
 
   async hasEntryForToday(goalId: string): Promise<boolean> {
-    const today = new Date();
+    return this.hasEntryForDate(goalId, new Date());
+  }
+
+  async hasEntryForYesterday(goalId: string): Promise<boolean> {
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    return this.hasEntryForDate(goalId, yesterday);
+  }
+
+  async hasEntryForDate(goalId: string, date: Date): Promise<boolean> {
     const startOfDay = new Date(
-      today.getFullYear(),
-      today.getMonth(),
-      today.getDate(),
+      date.getFullYear(),
+      date.getMonth(),
+      date.getDate(),
     );
 
     const endOfDay = new Date(
-      today.getFullYear(),
-      today.getMonth(),
-      today.getDate(),
+      date.getFullYear(),
+      date.getMonth(),
+      date.getDate(),
       23,
       59,
       59,

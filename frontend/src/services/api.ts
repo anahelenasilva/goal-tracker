@@ -18,6 +18,7 @@ export interface GoalEntriesResponse {
   entries: GoalEntry[];
   count: number;
   hasEntryToday: boolean;
+  hasEntryYesterday: boolean;
 }
 
 export const api = {
@@ -37,12 +38,15 @@ export const api = {
     return response.json();
   },
 
-  async addGoalEntry(goalId: string): Promise<GoalEntry> {
+  async addGoalEntry(goalId: string, date?: Date): Promise<GoalEntry> {
+    const body = date ? { createdAt: date.toISOString() } : {};
+
     const response = await fetch(`${API_BASE_URL}/goals/${goalId}/entries`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
+      body: JSON.stringify(body),
     });
 
     if (!response.ok) {
@@ -53,4 +57,3 @@ export const api = {
     return response.json();
   },
 };
-

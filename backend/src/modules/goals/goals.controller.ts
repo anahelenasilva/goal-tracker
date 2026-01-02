@@ -1,4 +1,5 @@
 import {
+  Body,
   Controller,
   Get,
   HttpCode,
@@ -8,6 +9,7 @@ import {
 } from '@nestjs/common';
 import { GoalEntry } from '../../entities/goal-entry.entity';
 import { Goal } from '../../entities/goal.entity';
+import { CreateGoalEntryDto } from './dto/create-goal-entry.dto';
 import { GoalsService } from './goals.service';
 
 @Controller('goals')
@@ -27,17 +29,21 @@ export class GoalsController {
   @Get(':id/entries')
   async getEntries(
     @Param('id') id: string,
-  ): Promise<{ entries: GoalEntry[]; count: number; hasEntryToday: boolean }> {
+  ): Promise<{ entries: GoalEntry[]; count: number; hasEntryToday: boolean; hasEntryYesterday: boolean }> {
     const entries = await this.goalsService.getGoalEntries(id);
     const count = entries.length;
     const hasEntryToday = await this.goalsService.hasEntryForToday(id);
+    const hasEntryYesterday = await this.goalsService.hasEntryForYesterday(id);
 
-    return { entries, count, hasEntryToday };
+    return { entries, count, hasEntryToday, hasEntryYesterday };
   }
 
   @Post(':id/entries')
   @HttpCode(HttpStatus.CREATED)
-  async createEntry(@Param('id') id: string): Promise<GoalEntry> {
-    return this.goalsService.createEntry(id);
+  async createEntry(
+    @Param('id') id: string,
+    @Body() createGoalEntryDto: CreateGoalEntryDto,
+  ): Promise<GoalEntry> {
+    return this.goalsService.createEntry(id, createGoalEntryDto.createdAt);
   }
 }
