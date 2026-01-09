@@ -16,6 +16,17 @@ import { GoalsService } from './goals.service';
 export class GoalsController {
   constructor(private readonly goalsService: GoalsService) { }
 
+  @Get('stats')
+  async getStats(): Promise<{ totalDays: number }> {
+    const totalDays = await this.goalsService.getTotalUniqueDays();
+    return { totalDays };
+  }
+
+  @Get('entries/timeline')
+  async getEntriesTimeline(): Promise<GoalEntry[]> {
+    return this.goalsService.getAllEntriesTimeline();
+  }
+
   @Get()
   async findAll(): Promise<Goal[]> {
     return this.goalsService.findAll();

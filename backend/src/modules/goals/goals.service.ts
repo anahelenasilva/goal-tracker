@@ -107,4 +107,24 @@ export class GoalsService {
 
     return count > 0;
   }
+
+  async getTotalUniqueDays(): Promise<number> {
+    const entries = await this.goalEntriesRepository.find();
+
+    const uniqueDates = new Set<string>();
+    entries.forEach((entry) => {
+      const date = new Date(entry.createdAt);
+      const dateString = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+      uniqueDates.add(dateString);
+    });
+
+    return uniqueDates.size;
+  }
+
+  async getAllEntriesTimeline(): Promise<GoalEntry[]> {
+    return this.goalEntriesRepository.find({
+      relations: ['goal'],
+      order: { createdAt: 'DESC' },
+    });
+  }
 }

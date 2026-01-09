@@ -5,9 +5,10 @@ import { EntryList } from './EntryList';
 
 interface GoalColumnProps {
   goal: Goal;
+  onEntryAdded?: () => void;
 }
 
-export function GoalColumn({ goal }: GoalColumnProps) {
+export function GoalColumn({ goal, onEntryAdded }: GoalColumnProps) {
   const [entries, setEntries] = useState<GoalEntry[]>([]);
   const [count, setCount] = useState(0);
   const [hasEntryToday, setHasEntryToday] = useState(false);
@@ -42,6 +43,7 @@ export function GoalColumn({ goal }: GoalColumnProps) {
       setError(null);
       await api.addGoalEntry(goal.id);
       await loadEntries();
+      onEntryAdded?.();
     } catch (err) {
       if (err instanceof Error) {
         setError(err.message);
@@ -62,6 +64,7 @@ export function GoalColumn({ goal }: GoalColumnProps) {
       yesterday.setDate(yesterday.getDate() - 1);
       await api.addGoalEntry(goal.id, yesterday);
       await loadEntries();
+      onEntryAdded?.();
     } catch (err) {
       if (err instanceof Error) {
         setError(err.message);

@@ -12,6 +12,10 @@ export interface GoalEntry {
   id: string;
   goalId: string;
   createdAt: string;
+  goal?: {
+    id: string;
+    title: string;
+  };
 }
 
 export interface GoalEntriesResponse {
@@ -19,6 +23,10 @@ export interface GoalEntriesResponse {
   count: number;
   hasEntryToday: boolean;
   hasEntryYesterday: boolean;
+}
+
+export interface StatsResponse {
+  totalDays: number;
 }
 
 export const api = {
@@ -52,6 +60,24 @@ export const api = {
     if (!response.ok) {
       const error = await response.json();
       throw new Error(error.message || 'Failed to add goal entry');
+    }
+
+    return response.json();
+  },
+
+  async getStats(): Promise<StatsResponse> {
+    const response = await fetch(`${API_BASE_URL}/goals/stats`);
+    if (!response.ok) {
+      throw new Error('Failed to fetch stats');
+    }
+
+    return response.json();
+  },
+
+  async getAllEntriesTimeline(): Promise<GoalEntry[]> {
+    const response = await fetch(`${API_BASE_URL}/goals/entries/timeline`);
+    if (!response.ok) {
+      throw new Error('Failed to fetch timeline entries');
     }
 
     return response.json();
