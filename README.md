@@ -83,7 +83,7 @@ cp .env.example .env
 # DATABASE_USER=postgres
 # DATABASE_PASSWORD=postgres
 # DATABASE_NAME=goal_tracker
-# PORT=3000
+# PORT=3005
 ```
 
 ### 4. Setup Frontend
@@ -121,7 +121,7 @@ pnpm run start:dev
 
 The backend will:
 - Connect to PostgreSQL on port **5434**
-- Start on `http://localhost:3000`
+- Start on `http://localhost:3005`
 - Automatically create database tables
 - Seed the database with an admin user and two default goals (exercise, treadmill)
 
@@ -344,7 +344,7 @@ DATABASE_PORT=5434  # Docker mapped port
 DATABASE_USER=postgres
 DATABASE_PASSWORD=postgres
 DATABASE_NAME=goal_tracker
-PORT=3000
+PORT=3005
 ```
 
 ## Troubleshooting

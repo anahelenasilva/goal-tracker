@@ -52,11 +52,11 @@ RUN echo "=== Production stage dist contents ===" && \
   (echo "ERROR: No main file found! Available files:" && find dist -type f | head -20 && exit 1)
 
 # Expose port
-EXPOSE 3000
+EXPOSE 3005
 
 # Health check (use 127.0.0.1 instead of localhost to avoid IPv6 issues)
 HEALTHCHECK --interval=30s --timeout=3s --start-period=40s --retries=3 \
-  CMD node -e "require('http').get('http://127.0.0.1:3000/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"
+  CMD node -e "require('http').get('http://127.0.0.1:3005/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"
 
 # Start the application
 # NestJS outputs to dist/src/main.js when sourceRoot is "src"
