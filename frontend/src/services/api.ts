@@ -1,5 +1,3 @@
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
-
 export interface Goal {
   id: string;
   userId: string;
@@ -29,9 +27,31 @@ export interface StatsResponse {
   totalDays: number;
 }
 
+export const getApiBaseUrl = (): string => {
+  if (import.meta.env.MODE === 'development') {
+    return import.meta.env.VITE_API_BASE_URL || 'http://localhost:3005';
+  }
+
+  //not the best solution, but it works for now; will improve later
+  if (import.meta.env.VITE_API_BASE_URL?.includes("railway.app")) {
+    return `${import.meta.env.VITE_API_BASE_URL}`
+  }
+
+  // If running in browser, use current hostname
+  if (typeof window !== 'undefined') {
+    const protocol = window.location.protocol;
+    const hostname = window.location.hostname;
+    const port = '3005'; // Your API port
+    return `${protocol}//${hostname}:${port}`;
+  }
+
+  // Fallback for server-side rendering (SSR)
+  return import.meta.env.VITE_API_BASE_URL || 'http://localhost:3005';
+}
+
 export const api = {
   async getGoals(): Promise<Goal[]> {
-    const response = await fetch(`${API_BASE_URL}/goals`);
+    const response = await fetch(`${getApiBaseUrl()}/goals`);
     if (!response.ok) {
       throw new Error('Failed to fetch goals');
     }
@@ -39,7 +59,7 @@ export const api = {
   },
 
   async getGoalEntries(goalId: string): Promise<GoalEntriesResponse> {
-    const response = await fetch(`${API_BASE_URL}/goals/${goalId}/entries`);
+    const response = await fetch(`${getApiBaseUrl()}/goals/${goalId}/entries`);
     if (!response.ok) {
       throw new Error('Failed to fetch goal entries');
     }
@@ -49,7 +69,7 @@ export const api = {
   async addGoalEntry(goalId: string, date?: Date): Promise<GoalEntry> {
     const body = date ? { createdAt: date.toISOString() } : {};
 
-    const response = await fetch(`${API_BASE_URL}/goals/${goalId}/entries`, {
+    const response = await fetch(`${getApiBaseUrl()}/goals/${goalId}/entries`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -66,7 +86,7 @@ export const api = {
   },
 
   async getStats(): Promise<StatsResponse> {
-    const response = await fetch(`${API_BASE_URL}/goals/stats`);
+    const response = await fetch(`${getApiBaseUrl()}/goals/stats`);
     if (!response.ok) {
       throw new Error('Failed to fetch stats');
     }
@@ -75,7 +95,7 @@ export const api = {
   },
 
   async getAllEntriesTimeline(): Promise<GoalEntry[]> {
-    const response = await fetch(`${API_BASE_URL}/goals/entries/timeline`);
+    const response = await fetch(`${getApiBaseUrl()}/goals/entries/timeline`);
     if (!response.ok) {
       throw new Error('Failed to fetch timeline entries');
     }
