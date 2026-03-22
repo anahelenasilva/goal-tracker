@@ -34,3 +34,5 @@ nginx/ssl/
 *.key
 *.crt
 
+_bmad/
+_bmad-output/
