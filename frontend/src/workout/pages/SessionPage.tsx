@@ -1,10 +1,12 @@
 import { useCallback, useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useWorkoutProviders } from '../context';
 import { SetList, SetLoggingForm } from '../components';
 import type { WorkoutSession, WorkoutSet, WeightUnit } from '../types';
 
 export function WorkoutSessionPage() {
   const { sessions, sets } = useWorkoutProviders();
+  const navigate = useNavigate();
   const [activeSession, setActiveSession] = useState<WorkoutSession | null>(null);
   const [sessionSets, setSessionSets] = useState<WorkoutSet[]>([]);
   const [loading, setLoading] = useState(true);
@@ -38,7 +40,7 @@ export function WorkoutSessionPage() {
       const ended = await sessions.end(activeSession.id);
       setActiveSession(null);
       setSessionSets([]);
-      console.log('Session ended:', ended);
+      navigate('/workout/history', { state: { sessionId: ended.id } });
     } finally {
       setEndingSession(false);
     }
