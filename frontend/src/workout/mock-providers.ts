@@ -137,14 +137,28 @@ class MockWorkoutSessionProvider implements WorkoutSessionProvider {
 
 class MockWorkoutSetProvider implements WorkoutSetProvider {
   private sets: Map<string, WorkoutSet[]> = new Map();
+  private exerciseProvider: ExerciseProvider;
+
+  constructor(exerciseProvider: ExerciseProvider) {
+    this.exerciseProvider = exerciseProvider;
+  }
 
   async getBySession(sessionId: string): Promise<WorkoutSet[]> {
-    return this.sets.get(sessionId) || [];
+    const sets = this.sets.get(sessionId) || [];
+    const setsWithExercises = await Promise.all(
+      sets.map(async (set) => ({
+        ...set,
+        exercise: await this.exerciseProvider.getById(set.exerciseId) || undefined,
+      }))
+    );
+    return setsWithExercises;
   }
 
   async add(sessionId: string, data: Omit<WorkoutSet, 'id' | 'sessionId' | 'createdAt'>): Promise<WorkoutSet> {
+    const exercise = await this.exerciseProvider.getById(data.exerciseId);
     const set: WorkoutSet = {
       ...data,
+      exercise: exercise || undefined,
       id: generateId(),
       sessionId,
       createdAt: now(),
@@ -284,12 +298,19 @@ class MockGraphProvider implements GraphProvider {
 }
 
 export function createMockProviders(): WorkoutProviders {
+  const exercises = new MockExerciseProvider();
+  const sessions = new MockWorkoutSessionProvider();
+  const sets = new MockWorkoutSetProvider(exercises);
+  const plans = new MockTrainingPlanProvider();
+  const history = new MockHistoryProvider();
+  const graphs = new MockGraphProvider();
+
   return {
-    exercises: new MockExerciseProvider(),
-    sessions: new MockWorkoutSessionProvider(),
-    sets: new MockWorkoutSetProvider(),
-    plans: new MockTrainingPlanProvider(),
-    history: new MockHistoryProvider(),
-    graphs: new MockGraphProvider(),
+    exercises,
+    sessions,
+    sets,
+    plans,
+    history,
+    graphs,
   };
 }

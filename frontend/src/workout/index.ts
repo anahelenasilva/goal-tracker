@@ -9,4 +9,5 @@ export { TimerPage } from './pages/TimerPage';
 export type { WorkoutProviders } from './providers';
 export * from './types';
 export { WorkoutLayout } from './WorkoutLayout';
+export { ExercisePicker, SetList, SetLoggingForm } from './components';
 
