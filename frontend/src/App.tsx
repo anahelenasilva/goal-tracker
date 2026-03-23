@@ -5,6 +5,7 @@ import {
   ExercisesPage,
   GraphsPage,
   HistoryPage,
+  PlanDetailPage,
   PlansPage,
   TimerPage,
   WorkoutLayout,
@@ -24,6 +25,7 @@ function App() {
             <Route index element={<WorkoutSessionPage />} />
             <Route path="history" element={<HistoryPage />} />
             <Route path="plans" element={<PlansPage />} />
+            <Route path="plans/:planId" element={<PlanDetailPage />} />
             <Route path="exercises" element={<ExercisesPage />} />
             <Route path="graphs" element={<GraphsPage />} />
             <Route path="graphs/:exerciseId" element={<GraphsPage />} />
