@@ -36,3 +36,5 @@ nginx/ssl/
 
 _bmad/
 _bmad-output/
+
+.sandcastle/
