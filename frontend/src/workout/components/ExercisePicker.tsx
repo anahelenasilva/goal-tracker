@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { useWorkoutProviders } from '../context';
+import { useWorkoutProviders } from '../hooks';
 import type { Exercise } from '../types';
 
 interface ExercisePickerProps {

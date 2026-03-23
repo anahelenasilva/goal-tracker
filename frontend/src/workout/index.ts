@@ -1,4 +1,5 @@
-export { useWorkoutProviders, WorkoutProvidersProvider } from './context';
+export { useWorkoutProviders } from './hooks';
+export { WorkoutProvidersProvider } from './context';
 export { createMockProviders } from './mock-providers';
 export { ExercisesPage } from './pages/ExercisesPage';
 export { GraphsPage } from './pages/GraphsPage';

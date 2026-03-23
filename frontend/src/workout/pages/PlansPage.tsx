@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useWorkoutProviders } from '../context';
+import { useWorkoutProviders } from '../hooks';
 import type { TrainingPlan } from '../types';
 import { DeletePlanDialog, PlanFormModal } from '../components/PlanFormModal';
 

@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import type {
   ExerciseProvider,
   GraphProvider,
@@ -279,21 +278,97 @@ class MockTrainingPlanProvider implements TrainingPlanProvider {
 }
 
 class MockHistoryProvider implements HistoryProvider {
-  async getExerciseHistory(_exerciseId: string): Promise<ExerciseHistoryEntry[]> {
-    return [];
+  private sessionProvider: WorkoutSessionProvider;
+  private setProvider: WorkoutSetProvider;
+
+  constructor(sessionProvider: WorkoutSessionProvider, setProvider: WorkoutSetProvider) {
+    this.sessionProvider = sessionProvider;
+    this.setProvider = setProvider;
   }
 
-  async getRecentSessions(_limit = 10): Promise<WorkoutSession[]> {
-    return [];
+  async getExerciseHistory(exerciseId: string): Promise<ExerciseHistoryEntry[]> {
+    const sessions = await this.sessionProvider.getAll();
+    const completedSessions = sessions.filter(s => s.status === 'completed');
+    const entries: ExerciseHistoryEntry[] = [];
+
+    for (const session of completedSessions) {
+      const sets = await this.setProvider.getBySession(session.id);
+      const exerciseSets = sets.filter(s => s.exerciseId === exerciseId);
+
+      if (exerciseSets.length > 0 && exerciseSets[0].exercise) {
+        entries.push({
+          id: `${session.id}-${exerciseId}`,
+          sessionId: session.id,
+          sessionStartedAt: session.startedAt,
+          exerciseId,
+          exercise: exerciseSets[0].exercise,
+          sets: exerciseSets,
+        });
+      }
+    }
+
+    return entries.sort((a, b) =>
+      new Date(b.sessionStartedAt).getTime() - new Date(a.sessionStartedAt).getTime()
+    );
+  }
+
+  async getRecentSessions(limit = 10): Promise<WorkoutSession[]> {
+    const sessions = await this.sessionProvider.getAll();
+    return sessions
+      .filter(s => s.status === 'completed')
+      .slice(0, limit);
   }
 }
 
 class MockGraphProvider implements GraphProvider {
+  private sessionProvider: WorkoutSessionProvider;
+  private setProvider: WorkoutSetProvider;
+
+  constructor(sessionProvider: WorkoutSessionProvider, setProvider: WorkoutSetProvider) {
+    this.sessionProvider = sessionProvider;
+    this.setProvider = setProvider;
+  }
+
   async getExerciseProgress(
-    _exerciseId: string,
-    _options?: { period?: string; limit?: number }
+    exerciseId: string,
+    options?: { period?: string; limit?: number }
   ): Promise<ExerciseProgressPoint[]> {
-    return [];
+    const sessions = await this.sessionProvider.getAll();
+    const completedSessions = sessions
+      .filter(s => s.status === 'completed')
+      .sort((a, b) => new Date(a.startedAt).getTime() - new Date(b.startedAt).getTime());
+
+    const periodDays = options?.period ? parseInt(options.period, 10) : 90;
+    const cutoffDate = new Date();
+    cutoffDate.setDate(cutoffDate.getDate() - periodDays);
+
+    const points: ExerciseProgressPoint[] = [];
+    const limit = options?.limit || 365;
+
+    for (const session of completedSessions) {
+      const sessionDate = new Date(session.startedAt);
+      if (sessionDate < cutoffDate) continue;
+
+      const sets = await this.setProvider.getBySession(session.id);
+      const exerciseSets = sets.filter(s => s.exerciseId === exerciseId);
+
+      if (exerciseSets.length > 0) {
+        const maxWeight = Math.max(...exerciseSets.map(s => s.weight));
+        const maxReps = Math.max(...exerciseSets.map(s => s.reps));
+        const totalVolume = exerciseSets.reduce((sum, s) => sum + (s.weight * s.reps), 0);
+
+        points.push({
+          date: session.startedAt,
+          weight: maxWeight,
+          reps: maxReps,
+          volume: totalVolume,
+        });
+      }
+
+      if (points.length >= limit) break;
+    }
+
+    return points;
   }
 }
 
@@ -302,8 +377,8 @@ export function createMockProviders(): WorkoutProviders {
   const sessions = new MockWorkoutSessionProvider();
   const sets = new MockWorkoutSetProvider(exercises);
   const plans = new MockTrainingPlanProvider();
-  const history = new MockHistoryProvider();
-  const graphs = new MockGraphProvider();
+  const history = new MockHistoryProvider(sessions, sets);
+  const graphs = new MockGraphProvider(sessions, sets);
 
   return {
     exercises,

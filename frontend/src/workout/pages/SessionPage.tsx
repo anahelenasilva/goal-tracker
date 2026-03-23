@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useWorkoutProviders } from '../context';
+import { useWorkoutProviders } from '../hooks';
 import { SetList, SetLoggingForm } from '../components';
 import type { WorkoutSession, WorkoutSet, WeightUnit } from '../types';
 
