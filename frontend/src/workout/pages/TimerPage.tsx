@@ -126,8 +126,15 @@ function CircularProgress({
   };
 
   return (
-    <div className="relative inline-flex items-center justify-center">
-      <svg height={radius * 2} width={radius * 2} className="transform -rotate-90">
+    <div
+      className="relative inline-flex items-center justify-center"
+      role="progressbar"
+      aria-valuenow={timeLeft}
+      aria-valuemin={0}
+      aria-valuemax={duration}
+      aria-label={`Rest timer: ${formatTime(timeLeft)} remaining`}
+    >
+      <svg height={radius * 2} width={radius * 2} className="transform -rotate-90" aria-hidden="true">
         <circle
           stroke="#374151"
           fill="transparent"
@@ -303,7 +310,11 @@ export function TimerPage() {
           <CircularProgress progress={progress} timeLeft={timeLeft} duration={duration} />
 
           {hasCompleted && (
-            <div className="mt-4 text-green-400 font-medium animate-pulse">
+            <div
+              className="mt-4 text-green-400 font-medium animate-pulse"
+              role="status"
+              aria-live="polite"
+            >
               Timer Complete!
             </div>
           )}

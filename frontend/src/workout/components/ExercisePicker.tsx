@@ -14,7 +14,10 @@ export function ExercisePicker({ value, onChange, placeholder = 'Select exercise
   const [query, setQuery] = useState('');
   const [isOpen, setIsOpen] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [highlightedIndex, setHighlightedIndex] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const listId = 'exercise-list';
 
   useEffect(() => {
     const loadExercises = async () => {
@@ -54,14 +57,54 @@ export function ExercisePicker({ value, onChange, placeholder = 'Select exercise
     onChange(exercise);
     setQuery('');
     setIsOpen(false);
+    setHighlightedIndex(0);
   };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (!isOpen) {
+      if (e.key === 'Enter' || e.key === ' ' || e.key === 'ArrowDown') {
+        e.preventDefault();
+        setIsOpen(true);
+      }
+      return;
+    }
+
+    const flatExercises = Object.values(groupedExercises).flat();
+
+    switch (e.key) {
+      case 'ArrowDown':
+        e.preventDefault();
+        setHighlightedIndex((prev) => Math.min(prev + 1, flatExercises.length - 1));
+        break;
+      case 'ArrowUp':
+        e.preventDefault();
+        setHighlightedIndex((prev) => Math.max(prev - 1, 0));
+        break;
+      case 'Enter':
+        e.preventDefault();
+        if (flatExercises[highlightedIndex]) {
+          handleSelect(flatExercises[highlightedIndex]);
+        }
+        break;
+      case 'Escape':
+        e.preventDefault();
+        setIsOpen(false);
+        break;
+    }
+  };
+
+  const flatExercisesList = Object.values(groupedExercises).flat();
 
   return (
     <div ref={containerRef} className="relative">
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
+        onKeyDown={handleKeyDown}
         className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-left text-white hover:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        aria-haspopup="listbox"
+        aria-expanded={isOpen}
+        aria-controls={listId}
       >
         {value ? (
           <div className="flex items-center justify-between">
@@ -74,22 +117,32 @@ export function ExercisePicker({ value, onChange, placeholder = 'Select exercise
       </button>
 
       {isOpen && (
-        <div className="absolute z-50 w-full mt-1 bg-gray-800 border border-gray-700 rounded-lg shadow-xl max-h-64 overflow-auto">
+        <div
+          id={listId}
+          role="listbox"
+          className="absolute z-50 w-full mt-1 bg-gray-800 border border-gray-700 rounded-lg shadow-xl max-h-64 overflow-auto"
+        >
           <div className="p-2 border-b border-gray-700">
             <input
+              ref={inputRef}
               type="text"
               value={query}
-              onChange={(e) => setQuery(e.target.value)}
+              onChange={(e) => {
+                setQuery(e.target.value);
+                setHighlightedIndex(0);
+              }}
+              onKeyDown={handleKeyDown}
               placeholder="Search exercises..."
               className="w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded text-white placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              aria-label="Search exercises"
               autoFocus
             />
           </div>
 
           {loading ? (
-            <div className="p-4 text-center text-gray-400">Loading...</div>
+            <div className="p-4 text-center text-gray-400" role="status">Loading...</div>
           ) : filteredExercises.length === 0 ? (
-            <div className="p-4 text-center text-gray-400">No exercises found</div>
+            <div className="p-4 text-center text-gray-400" role="status">No exercises found</div>
           ) : (
             <div className="py-1">
               {Object.entries(groupedExercises).map(([category, exercises]) => (
@@ -97,16 +150,23 @@ export function ExercisePicker({ value, onChange, placeholder = 'Select exercise
                   <div className="px-3 py-1 text-xs font-semibold text-gray-500 uppercase bg-gray-900">
                     {category}
                   </div>
-                  {exercises.map((exercise) => (
-                    <button
-                      key={exercise.id}
-                      type="button"
-                      onClick={() => handleSelect(exercise)}
-                      className="w-full px-3 py-2 text-left text-white hover:bg-gray-700"
-                    >
-                      {exercise.name}
-                    </button>
-                  ))}
+                  {exercises.map((exercise) => {
+                    const globalIndex = flatExercisesList.indexOf(exercise);
+                    return (
+                      <button
+                        key={exercise.id}
+                        type="button"
+                        onClick={() => handleSelect(exercise)}
+                        onMouseEnter={() => setHighlightedIndex(globalIndex)}
+                        className="w-full px-3 py-2 text-left text-white hover:bg-gray-700"
+                        role="option"
+                        aria-selected={value?.id === exercise.id}
+                        id={`exercise-option-${exercise.id}`}
+                      >
+                        {exercise.name}
+                      </button>
+                    );
+                  })}
                 </div>
               ))}
             </div>

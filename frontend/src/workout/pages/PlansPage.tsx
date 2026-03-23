@@ -99,7 +99,7 @@ export function PlansPage() {
 
   if (loading) {
     return (
-      <div className="text-center py-12">
+      <div className="text-center py-12" role="status" aria-live="polite">
         <div className="text-xl text-gray-300">Loading...</div>
       </div>
     );
@@ -232,9 +232,10 @@ function PlanCard({ plan, onGetNames, onClick, onEdit, onDelete }: PlanCardProps
   };
 
   return (
-    <div
+    <button
+      type="button"
       onClick={onClick}
-      className="bg-gray-900 rounded-lg p-5 border border-gray-800 hover:border-gray-700 transition-colors cursor-pointer group"
+      className="w-full text-left bg-gray-900 rounded-lg p-5 border border-gray-800 hover:border-gray-700 transition-colors cursor-pointer group focus:outline-none focus:ring-2 focus:ring-blue-500"
     >
       <div className="flex items-start justify-between mb-2">
         <h3 className="text-lg font-semibold text-white">{plan.name}</h3>
@@ -242,7 +243,7 @@ function PlanCard({ plan, onGetNames, onClick, onEdit, onDelete }: PlanCardProps
           <button
             onClick={handleEdit}
             className="p-1.5 text-gray-400 hover:text-white hover:bg-gray-800 rounded"
-            title="Edit"
+            aria-label={`Edit ${plan.name}`}
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
@@ -251,7 +252,7 @@ function PlanCard({ plan, onGetNames, onClick, onEdit, onDelete }: PlanCardProps
           <button
             onClick={handleDelete}
             className="p-1.5 text-red-400 hover:text-red-300 hover:bg-red-900/30 rounded"
-            title="Delete"
+            aria-label={`Delete ${plan.name}`}
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -297,6 +298,6 @@ function PlanCard({ plan, onGetNames, onClick, onEdit, onDelete }: PlanCardProps
           </span>
         )}
       </div>
-    </div>
+    </button>
   );
 }

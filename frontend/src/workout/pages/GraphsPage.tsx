@@ -61,7 +61,13 @@ function LineChart({
   const xTicks = Math.min(data.length, 5);
 
   return (
-    <svg viewBox={`0 0 ${width} ${height}`} className="w-full h-full" style={{ height }}>
+    <svg
+      viewBox={`0 0 ${width} ${height}`}
+      className="w-full h-full"
+      style={{ height }}
+      role="img"
+      aria-label={`${metric === 'weight' ? 'Max Weight' : metric === 'reps' ? 'Max Reps' : 'Total Volume'} chart showing ${data.length} data points from ${new Date(data[0]?.date).toLocaleDateString()} to ${new Date(data[data.length - 1]?.date).toLocaleDateString()}`}
+    >
       <rect x={0} y={0} width={width} height={height} fill="#1f2937" rx={8} />
 
       {Array.from({ length: yTicks + 1 }).map((_, i) => {
@@ -189,7 +195,7 @@ export function GraphsPage() {
         <div className="bg-gray-900 rounded-lg p-6 border border-gray-800">
           <h2 className="text-2xl font-bold text-white mb-2">Progress Graphs</h2>
         </div>
-        <div className="text-center py-12 text-gray-400">Loading...</div>
+        <div className="text-center py-12 text-gray-400" role="status" aria-live="polite">Loading...</div>
       </div>
     );
   }

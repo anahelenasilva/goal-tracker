@@ -134,7 +134,11 @@ export function SetLoggingForm({ onSubmit, lastSet }: SetLoggingFormProps) {
       </div>
 
       {error && (
-        <div className="px-3 py-2 bg-red-900/50 border border-red-800 rounded-lg text-red-300 text-sm">
+        <div
+          id="set-form-error"
+          className="px-3 py-2 bg-red-900/50 border border-red-800 rounded-lg text-red-300 text-sm"
+          role="alert"
+        >
           {error}
         </div>
       )}

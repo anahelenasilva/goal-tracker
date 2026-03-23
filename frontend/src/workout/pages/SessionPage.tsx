@@ -71,7 +71,7 @@ export function WorkoutSessionPage() {
 
   if (loading) {
     return (
-      <div className="text-center py-12">
+      <div className="text-center py-12" role="status" aria-live="polite">
         <div className="text-xl text-gray-300">Loading...</div>
       </div>
     );

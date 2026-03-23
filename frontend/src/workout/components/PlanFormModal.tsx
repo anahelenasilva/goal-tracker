@@ -63,16 +63,22 @@ export function PlanFormModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="plan-modal-title"
+    >
       <div className="bg-gray-900 rounded-lg p-6 w-full max-w-md border border-gray-800">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-xl font-bold text-white">
+          <h3 id="plan-modal-title" className="text-xl font-bold text-white">
             {plan ? 'Edit Plan' : 'New Training Plan'}
           </h3>
           <button
             type="button"
             onClick={onClose}
             className="text-gray-400 hover:text-white"
+            aria-label="Close dialog"
           >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -92,6 +98,9 @@ export function PlanFormModal({
               onChange={(e) => setName(e.target.value)}
               className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="e.g., Push Day, Leg Day"
+              required
+              aria-invalid={!!validationError}
+              aria-describedby={validationError ? 'plan-form-error' : undefined}
               autoFocus
             />
           </div>
@@ -133,7 +142,11 @@ export function PlanFormModal({
           </div>
 
           {(validationError || error) && (
-            <div className="p-3 bg-red-900/50 border border-red-800 rounded-lg text-red-300 text-sm">
+            <div
+              id="plan-form-error"
+              className="p-3 bg-red-900/50 border border-red-800 rounded-lg text-red-300 text-sm"
+              role="alert"
+            >
               {validationError || error}
             </div>
           )}
@@ -184,15 +197,24 @@ export function DeletePlanDialog({
   }, [onClose]);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+      role="alertdialog"
+      aria-modal="true"
+      aria-labelledby="delete-dialog-title"
+      aria-describedby="delete-dialog-desc"
+    >
       <div className="bg-gray-900 rounded-lg p-6 w-full max-w-md border border-gray-800">
-        <h3 className="text-xl font-bold text-white mb-2">Delete Training Plan</h3>
-        <p className="text-gray-300 mb-4">
+        <h3 id="delete-dialog-title" className="text-xl font-bold text-white mb-2">Delete Training Plan</h3>
+        <p id="delete-dialog-desc" className="text-gray-300 mb-4">
           Are you sure you want to delete <span className="font-semibold text-white">{planName}</span>? This action cannot be undone.
         </p>
 
         {error && (
-          <div className="p-3 bg-red-900/50 border border-red-800 rounded-lg text-red-300 text-sm mb-4">
+          <div
+            className="p-3 bg-red-900/50 border border-red-800 rounded-lg text-red-300 text-sm mb-4"
+            role="alert"
+          >
             {error}
           </div>
         )}

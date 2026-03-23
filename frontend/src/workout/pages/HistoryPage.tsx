@@ -293,7 +293,7 @@ export function HistoryPage() {
         <div className="bg-gray-900 rounded-lg p-6 border border-gray-800">
           <h2 className="text-2xl font-bold text-white mb-2">Workout History</h2>
         </div>
-        <div className="text-center py-12 text-gray-400">Loading...</div>
+        <div className="text-center py-12 text-gray-400" role="status" aria-live="polite">Loading...</div>
       </div>
     );
   }
