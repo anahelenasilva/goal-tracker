@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { GoalColumn } from '../components/GoalColumn';
 import { Timeline, type TimelineRef } from '../components/Timeline';
 import type { Goal } from '../services/api';
@@ -34,7 +35,6 @@ export function Dashboard() {
   };
 
   const handleEntryAdded = async () => {
-    // Refresh stats and timeline when an entry is added
     try {
       const statsData = await api.getStats();
       setTotalDays(statsData.totalDays);
@@ -63,9 +63,17 @@ export function Dashboard() {
   return (
     <div className="min-h-screen bg-gray-950 py-8 px-4">
       <div className="max-w-7xl mx-auto">
-        <h1 className="text-4xl font-bold text-white mb-2 text-center">
-          2026 Goal Tracker
-        </h1>
+        <div className="flex items-center justify-between mb-8">
+          <h1 className="text-4xl font-bold text-white">
+            2026 Goal Tracker
+          </h1>
+          <Link
+            to="/workout"
+            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors"
+          >
+            Workout Tracker
+          </Link>
+        </div>
 
         {totalDays !== null && (
           <p className="text-xl text-gray-400 mb-8 text-center">
@@ -84,4 +92,3 @@ export function Dashboard() {
     </div>
   );
 }
-
