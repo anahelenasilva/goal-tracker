@@ -26,7 +26,8 @@
     "docker:down": "docker-compose down",
     "docker:logs": "docker-compose logs -f postgres",
     "docker:restart": "docker-compose restart",
-    "docker:clean": "docker-compose down -v"
+    "docker:clean": "docker-compose down -v",
+    "ralph": "bash ./.sandcastle/run.sh"
   },
   "dependencies": {
     "@nestjs/common": "^11.0.1",
