@@ -31,7 +31,7 @@ export class WorkoutSet {
   @Column({ name: 'weight_unit', type: 'varchar' })
   weightUnit: WeightUnit;
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   notes: string | null;
 
   @CreateDateColumn({ name: 'created_at' })

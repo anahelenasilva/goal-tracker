@@ -16,7 +16,7 @@ export class TrainingPlan {
   @Column()
   name: string;
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   description: string | null;
 
   @Column({ name: 'assigned_days', type: 'simple-array', nullable: true })
