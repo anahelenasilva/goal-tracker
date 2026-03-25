@@ -347,6 +347,8 @@ Out-of-scope items for this step include SEO optimization, real-time sync, legac
 - FR29: Users can view per-exercise progression charts across selectable periods.
 - FR30: Users can switch graph metrics and units for trend interpretation.
 - FR31: Users can constrain graph data by date range and record limits.
+- FR49: Users can delete a completed workout session from history.
+- FR50: Users can delete individual set entries from within a workout session.
 
 ### Timer and In-Workout Utility
 
