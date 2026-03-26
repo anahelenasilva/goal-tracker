@@ -24,6 +24,8 @@ const makeSession = (overrides: Partial<WorkoutSession> = {}): WorkoutSession =>
   status: 'active',
   startedAt: new Date(),
   endedAt: null,
+  planId: null,
+  plan: null,
   createdAt: new Date(),
   updatedAt: new Date(),
   sets: [],
@@ -244,6 +246,17 @@ describe('WorkoutsController', () => {
         expect(result.status).toBe('active');
       });
 
+      it('should create a session with planId', async () => {
+        const session = makeSession({ planId: 'plan-1' });
+        service.createSession.mockResolvedValue(session);
+
+        const result = await controller.createSession({ planId: 'plan-1' });
+
+        expect(result.status).toBe('active');
+        expect(result.planId).toBe('plan-1');
+        expect(service.createSession).toHaveBeenCalledWith({ planId: 'plan-1' });
+      });
+
       it('should throw ConflictException when active session exists', async () => {
         service.createSession.mockRejectedValue(new ConflictException());
 
@@ -360,6 +373,18 @@ describe('WorkoutsController', () => {
         const result = await controller.getPlanById('plan-1');
 
         expect(result).toEqual(plan);
+      });
+    });
+
+    describe('GET /workouts/plans/:id/full', () => {
+      it('should return a plan with full exercise data', async () => {
+        const plan = makePlan();
+        service.getPlanById.mockResolvedValue(plan);
+
+        const result = await controller.getPlanFull('plan-1');
+
+        expect(result).toEqual(plan);
+        expect(service.getPlanById).toHaveBeenCalledWith('plan-1');
       });
     });
 

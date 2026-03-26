@@ -20,7 +20,7 @@ export interface WorkoutSessionProvider {
   getActive(): Promise<WorkoutSession | null>;
   getById(id: string): Promise<WorkoutSession | null>;
   getAll(): Promise<WorkoutSession[]>;
-  create(): Promise<WorkoutSession>;
+  create(planId?: string): Promise<WorkoutSession>;
   end(id: string): Promise<WorkoutSession>;
   abandon(id: string): Promise<WorkoutSession>;
 }

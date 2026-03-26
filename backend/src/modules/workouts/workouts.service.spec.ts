@@ -29,6 +29,8 @@ const makeSession = (
   status: 'active',
   startedAt: new Date(),
   endedAt: null,
+  planId: null,
+  plan: null,
   createdAt: new Date(),
   updatedAt: new Date(),
   sets: [],
@@ -122,8 +124,33 @@ describe('WorkoutsService', () => {
         expect(result.endedAt).toBeNull();
         expect(workoutSessionsRepository.findOne).toHaveBeenCalledWith({
           where: { status: 'active' },
+          relations: ['plan'],
           order: { startedAt: 'DESC' },
         });
+      });
+
+      it('should create a session with a planId', async () => {
+        workoutSessionsRepository.findOne
+          .mockResolvedValueOnce(null)
+          .mockResolvedValueOnce(makeSession({ planId: 'plan-1' }));
+        const plan = makePlan();
+        trainingPlansRepository.findOne.mockResolvedValue(plan);
+        const newSession = makeSession({ planId: 'plan-1' });
+        workoutSessionsRepository.create.mockReturnValue(newSession);
+        workoutSessionsRepository.save.mockResolvedValue(newSession);
+
+        const result = await service.createSession({ planId: 'plan-1' });
+
+        expect(result.planId).toBe('plan-1');
+      });
+
+      it('should throw NotFoundException when planId does not exist', async () => {
+        workoutSessionsRepository.findOne.mockResolvedValue(null);
+        trainingPlansRepository.findOne.mockResolvedValue(null);
+
+        await expect(
+          service.createSession({ planId: 'non-existent' }),
+        ).rejects.toThrow(NotFoundException);
       });
 
       it('should throw ConflictException when an active session already exists', async () => {

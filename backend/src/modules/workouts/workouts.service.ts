@@ -12,6 +12,7 @@ import { WorkoutSession } from '../../entities/workout-session.entity';
 import { WorkoutSet } from '../../entities/workout-set.entity';
 import { AddPlanExerciseDto } from './dto/add-plan-exercise.dto';
 import { CreateExerciseDto } from './dto/create-exercise.dto';
+import { CreateSessionDto } from './dto/create-session.dto';
 import { CreateTrainingPlanDto } from './dto/create-training-plan.dto';
 import { CreateWorkoutSetDto } from './dto/create-workout-set.dto';
 import { ReorderPlanExercisesDto } from './dto/reorder-plan-exercises.dto';
@@ -73,6 +74,7 @@ export class WorkoutsService {
   async getActiveSession(): Promise<WorkoutSession | null> {
     return this.workoutSessionsRepository.findOne({
       where: { status: 'active' },
+      relations: ['plan'],
       order: { startedAt: 'DESC' },
     });
   }
@@ -86,6 +88,7 @@ export class WorkoutsService {
   async getSessionById(id: string): Promise<WorkoutSession> {
     const session = await this.workoutSessionsRepository.findOne({
       where: { id },
+      relations: ['plan'],
     });
     if (!session) {
       throw new NotFoundException(`Session with ID ${id} not found`);
@@ -93,19 +96,35 @@ export class WorkoutsService {
     return session;
   }
 
-  async createSession(): Promise<WorkoutSession> {
+  async createSession(data?: CreateSessionDto): Promise<WorkoutSession> {
     const activeSession = await this.getActiveSession();
     if (activeSession) {
       throw new ConflictException('An active session already exists');
+    }
+
+    if (data?.planId) {
+      const plan = await this.trainingPlansRepository.findOne({
+        where: { id: data.planId },
+      });
+      if (!plan) {
+        throw new NotFoundException(`Plan with ID ${data.planId} not found`);
+      }
     }
 
     const session = this.workoutSessionsRepository.create({
       status: 'active',
       startedAt: new Date(),
       endedAt: null,
+      planId: data?.planId ?? null,
     });
 
-    return this.workoutSessionsRepository.save(session);
+    const saved = await this.workoutSessionsRepository.save(session);
+
+    if (saved.planId) {
+      return this.getSessionById(saved.id);
+    }
+
+    return saved;
   }
 
   async endSession(id: string): Promise<WorkoutSession> {

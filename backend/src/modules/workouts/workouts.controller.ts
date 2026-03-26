@@ -16,6 +16,7 @@ import { WorkoutSession } from '../../entities/workout-session.entity';
 import { WorkoutSet } from '../../entities/workout-set.entity';
 import { AddPlanExerciseDto } from './dto/add-plan-exercise.dto';
 import { CreateExerciseDto } from './dto/create-exercise.dto';
+import { CreateSessionDto } from './dto/create-session.dto';
 import { CreateTrainingPlanDto } from './dto/create-training-plan.dto';
 import { CreateWorkoutSetDto } from './dto/create-workout-set.dto';
 import { ReorderPlanExercisesDto } from './dto/reorder-plan-exercises.dto';
@@ -72,8 +73,8 @@ export class WorkoutsController {
   }
 
   @Post('sessions')
-  async createSession(): Promise<WorkoutSession> {
-    return this.workoutsService.createSession();
+  async createSession(@Body() dto?: CreateSessionDto): Promise<WorkoutSession> {
+    return this.workoutsService.createSession(dto);
   }
 
   @Post('sessions/:id/end')
@@ -119,6 +120,11 @@ export class WorkoutsController {
 
   @Get('plans/:id')
   async getPlanById(@Param('id') id: string): Promise<TrainingPlan> {
+    return this.workoutsService.getPlanById(id);
+  }
+
+  @Get('plans/:id/full')
+  async getPlanFull(@Param('id') id: string): Promise<TrainingPlan> {
     return this.workoutsService.getPlanById(id);
   }
 

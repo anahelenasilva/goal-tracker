@@ -83,6 +83,11 @@ class MockExerciseProvider implements ExerciseProvider {
 class MockWorkoutSessionProvider implements WorkoutSessionProvider {
   private sessions: WorkoutSession[] = [];
   private activeSession: WorkoutSession | null = null;
+  private planProvider: MockTrainingPlanProvider | null = null;
+
+  setPlanProvider(planProvider: MockTrainingPlanProvider) {
+    this.planProvider = planProvider;
+  }
 
   async getActive(): Promise<WorkoutSession | null> {
     return this.activeSession;
@@ -96,14 +101,21 @@ class MockWorkoutSessionProvider implements WorkoutSessionProvider {
     return [...this.sessions];
   }
 
-  async create(): Promise<WorkoutSession> {
+  async create(planId?: string): Promise<WorkoutSession> {
     if (this.activeSession) {
       throw new Error('An active session already exists');
+    }
+    let plan: TrainingPlan | undefined;
+    if (planId && this.planProvider) {
+      const found = await this.planProvider.getById(planId);
+      if (found) plan = found;
     }
     this.activeSession = {
       id: generateId(),
       status: 'active',
       startedAt: now(),
+      planId: planId,
+      plan: plan,
       createdAt: now(),
       updatedAt: now(),
     };
@@ -382,6 +394,8 @@ export function createMockProviders(): WorkoutProviders {
   const plans = new MockTrainingPlanProvider();
   const history = new MockHistoryProvider(sessions, sets);
   const graphs = new MockGraphProvider(sessions, sets);
+
+  sessions.setPlanProvider(plans);
 
   return {
     exercises,
