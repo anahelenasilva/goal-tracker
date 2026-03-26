@@ -20,6 +20,11 @@ export class CreateExerciseDto {
   @MaxLength(120)
   name: string;
 
+  @IsString()
+  @MinLength(1)
+  @MaxLength(120)
+  namePt: string;
+
   @IsIn(EXERCISE_CATEGORIES)
   category: ExerciseCategory;
 

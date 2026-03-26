@@ -30,6 +30,7 @@ export function ExerciseFormModal({
   error,
 }: ExerciseFormModalProps) {
   const [name, setName] = useState(exercise?.name || '');
+  const [namePt, setNamePt] = useState(exercise?.namePt || '');
   const [category, setCategory] = useState<ExerciseCategory>(exercise?.category || 'other');
   const [validationError, setValidationError] = useState<string | null>(null);
 
@@ -46,13 +47,19 @@ export function ExerciseFormModal({
     setValidationError(null);
 
     const trimmedName = name.trim();
+    const trimmedNamePt = namePt.trim();
     if (!trimmedName) {
       setValidationError('Exercise name is required');
+      return;
+    }
+    if (!trimmedNamePt) {
+      setValidationError('Portuguese name is required');
       return;
     }
 
     await onSubmit({
       name: trimmedName,
+      namePt: trimmedNamePt,
       category,
       isCustom: true,
     });
@@ -89,6 +96,20 @@ export function ExerciseFormModal({
               className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="Exercise name"
               autoFocus
+            />
+          </div>
+
+          <div>
+            <label htmlFor="namePt" className="block text-sm font-medium text-gray-300 mb-1">
+              Portuguese Name
+            </label>
+            <input
+              id="namePt"
+              type="text"
+              value={namePt}
+              onChange={(e) => setNamePt(e.target.value)}
+              className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="Nome do exercício"
             />
           </div>
 

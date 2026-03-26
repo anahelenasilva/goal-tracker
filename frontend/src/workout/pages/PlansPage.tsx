@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useWorkoutProviders } from '../hooks';
 import type { TrainingPlan } from '../types';
+import { getExerciseDisplayName } from '../utils';
 import { DeletePlanDialog, PlanFormModal } from '../components/PlanFormModal';
 
 export function PlansPage() {
@@ -162,7 +163,7 @@ export function PlansPage() {
                 const names: string[] = [];
                 for (const id of ids) {
                   const exercise = await exercises.getById(id);
-                  if (exercise) names.push(exercise.name);
+                  if (exercise) names.push(getExerciseDisplayName(exercise));
                 }
                 return names;
               }}

@@ -29,6 +29,9 @@ export class Exercise {
   @Column()
   name: string;
 
+  @Column({ name: 'name_pt' })
+  namePt: string;
+
   @Column({ type: 'varchar' })
   category: ExerciseCategory;
 

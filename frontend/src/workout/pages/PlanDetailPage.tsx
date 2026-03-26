@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useWorkoutProviders } from '../hooks';
 import type { Exercise, TrainingPlan } from '../types';
+import { getExerciseDisplayName } from '../utils';
 import { DeletePlanDialog, PlanFormModal } from '../components/PlanFormModal';
 
 export function PlanDetailPage() {
@@ -284,7 +285,7 @@ function ExerciseRow({ exercise, index, total, onRemove, onMoveUp, onMoveDown }:
     <div className="flex items-center gap-3 p-3 bg-gray-800 rounded-lg group">
       <span className="text-gray-500 text-sm w-6">{index + 1}</span>
       <div className="flex-1">
-        <span className="text-white">{exercise.name}</span>
+        <span className="text-white">{getExerciseDisplayName(exercise)}</span>
       </div>
       <span
         className={`px-2 py-1 rounded text-xs ${categoryColors[exercise.category] || categoryColors.other}`}
@@ -425,7 +426,7 @@ function AddExerciseModal({ existingIds, onSelect, onClose, loading }: AddExerci
                         disabled={loading}
                         className="w-full px-3 py-2 text-left bg-gray-800 hover:bg-gray-700 rounded text-white text-sm disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                       >
-                        {exercise.name}
+                        {getExerciseDisplayName(exercise)}
                       </button>
                     ))}
                   </div>

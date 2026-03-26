@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useWorkoutProviders } from '../hooks';
 import type { Exercise, ExerciseHistoryEntry, WorkoutSession, WorkoutSet } from '../types';
+import { getExerciseDisplayName } from '../utils';
 
 function formatDateTime(isoString: string): string {
   return new Date(isoString).toLocaleString();
@@ -168,7 +169,7 @@ function ExerciseHistoryCard({
       className="w-full text-left p-4 rounded-lg border border-gray-700 bg-gray-900 hover:border-gray-600 transition-colors"
     >
       <div className="flex items-center justify-between mb-2">
-        <span className="text-white font-medium">{entry.exercise.name}</span>
+        <span className="text-white font-medium">{getExerciseDisplayName(entry.exercise)}</span>
         <span className="text-sm text-gray-400">
           {new Date(entry.sessionStartedAt).toLocaleDateString()}
         </span>
@@ -197,7 +198,7 @@ function ExerciseHistoryDetail({
       </button>
 
       <div className="bg-gray-900 rounded-lg p-6 border border-gray-800">
-        <h2 className="text-xl font-bold text-white mb-1">{entry.exercise.name}</h2>
+        <h2 className="text-xl font-bold text-white mb-1">{getExerciseDisplayName(entry.exercise)}</h2>
         <p className="text-gray-400 text-sm">{formatDateTime(entry.sessionStartedAt)}</p>
       </div>
 
@@ -332,7 +333,7 @@ export function HistoryPage() {
         </button>
 
         <div className="bg-gray-900 rounded-lg p-6 border border-gray-800">
-          <h2 className="text-2xl font-bold text-white mb-1">{selectedExercise.name}</h2>
+          <h2 className="text-2xl font-bold text-white mb-1">{getExerciseDisplayName(selectedExercise)}</h2>
           <p className="text-gray-400">
             {exerciseHistory.length} {exerciseHistory.length === 1 ? 'session' : 'sessions'}
           </p>
@@ -455,7 +456,7 @@ export function HistoryPage() {
                     onClick={() => setSelectedExercise(exercise)}
                     className="text-left p-4 rounded-lg border border-gray-700 bg-gray-900 hover:border-gray-600 transition-colors"
                   >
-                    <div className="text-white font-medium mb-1">{exercise.name}</div>
+                    <div className="text-white font-medium mb-1">{getExerciseDisplayName(exercise)}</div>
                     <div className="text-sm text-gray-400">
                       {exerciseSessions} {exerciseSessions === 1 ? 'session' : 'sessions'}
                     </div>

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useWorkoutProviders } from '../hooks';
 import type { Exercise } from '../types';
+import { getExerciseDisplayName } from '../utils';
 
 interface ExercisePickerProps {
   value: Exercise | null;
@@ -108,7 +109,7 @@ export function ExercisePicker({ value, onChange, placeholder = 'Select exercise
       >
         {value ? (
           <div className="flex items-center justify-between">
-            <span>{value.name}</span>
+            <span>{getExerciseDisplayName(value)}</span>
             <span className="text-sm text-gray-400 capitalize">{value.category}</span>
           </div>
         ) : (
@@ -163,7 +164,7 @@ export function ExercisePicker({ value, onChange, placeholder = 'Select exercise
                         aria-selected={value?.id === exercise.id}
                         id={`exercise-option-${exercise.id}`}
                       >
-                        {exercise.name}
+                        {getExerciseDisplayName(exercise)}
                       </button>
                     );
                   })}
