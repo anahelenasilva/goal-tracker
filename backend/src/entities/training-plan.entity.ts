@@ -19,7 +19,7 @@ export class TrainingPlan {
   @Column({ type: 'varchar', nullable: true })
   description: string | null;
 
-  @Column({ name: 'assigned_days', type: 'simple-array', nullable: true })
+  @Column({ name: 'assigned_days', type: 'varchar', array: true, nullable: true })
   assignedDays: string[] | null;
 
   @CreateDateColumn({ name: 'created_at' })
