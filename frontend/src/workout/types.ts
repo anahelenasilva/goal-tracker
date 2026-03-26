@@ -41,6 +41,8 @@ export interface WorkoutSession {
   status: WorkoutSessionStatus;
   startedAt: string;
   endedAt?: string;
+  planId?: string;
+  plan?: TrainingPlan;
   sets?: WorkoutSet[];
   createdAt: string;
   updatedAt: string;

@@ -12,6 +12,7 @@ import { WorkoutSession } from '../../entities/workout-session.entity';
 import { WorkoutSet } from '../../entities/workout-set.entity';
 import { AddPlanExerciseDto } from './dto/add-plan-exercise.dto';
 import { CreateExerciseDto } from './dto/create-exercise.dto';
+import { CreateSessionDto } from './dto/create-session.dto';
 import { CreateTrainingPlanDto } from './dto/create-training-plan.dto';
 import { CreateWorkoutSetDto } from './dto/create-workout-set.dto';
 import { ReorderPlanExercisesDto } from './dto/reorder-plan-exercises.dto';
@@ -71,10 +72,15 @@ export class WorkoutsService {
   }
 
   async getActiveSession(): Promise<WorkoutSession | null> {
-    return this.workoutSessionsRepository.findOne({
+    const session = await this.workoutSessionsRepository.findOne({
       where: { status: 'active' },
+      relations: ['plan', 'plan.planExercises', 'plan.planExercises.exercise'],
       order: { startedAt: 'DESC' },
     });
+    if (session?.plan) {
+      session.plan = this.toPlanView(session.plan);
+    }
+    return session;
   }
 
   async getSessions(): Promise<WorkoutSession[]> {
@@ -86,26 +92,46 @@ export class WorkoutsService {
   async getSessionById(id: string): Promise<WorkoutSession> {
     const session = await this.workoutSessionsRepository.findOne({
       where: { id },
+      relations: ['plan', 'plan.planExercises', 'plan.planExercises.exercise'],
     });
     if (!session) {
       throw new NotFoundException(`Session with ID ${id} not found`);
     }
+    if (session.plan) {
+      session.plan = this.toPlanView(session.plan);
+    }
     return session;
   }
 
-  async createSession(): Promise<WorkoutSession> {
+  async createSession(data?: CreateSessionDto): Promise<WorkoutSession> {
     const activeSession = await this.getActiveSession();
     if (activeSession) {
       throw new ConflictException('An active session already exists');
+    }
+
+    if (data?.planId) {
+      const plan = await this.trainingPlansRepository.findOne({
+        where: { id: data.planId },
+      });
+      if (!plan) {
+        throw new NotFoundException(`Plan with ID ${data.planId} not found`);
+      }
     }
 
     const session = this.workoutSessionsRepository.create({
       status: 'active',
       startedAt: new Date(),
       endedAt: null,
+      planId: data?.planId ?? null,
     });
 
-    return this.workoutSessionsRepository.save(session);
+    const saved = await this.workoutSessionsRepository.save(session);
+
+    if (saved.planId) {
+      return this.getSessionById(saved.id);
+    }
+
+    return saved;
   }
 
   async endSession(id: string): Promise<WorkoutSession> {
@@ -148,7 +174,11 @@ export class WorkoutsService {
       sessionId,
       notes: data.notes ?? null,
     });
-    return this.workoutSetsRepository.save(set);
+    const saved = await this.workoutSetsRepository.save(set);
+    return this.workoutSetsRepository.findOne({
+      where: { id: saved.id },
+      relations: ['exercise'],
+    }) as Promise<WorkoutSet>;
   }
 
   async updateSet(id: string, data: UpdateWorkoutSetDto): Promise<WorkoutSet> {

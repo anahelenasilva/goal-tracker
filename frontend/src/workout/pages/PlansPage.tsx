@@ -232,16 +232,26 @@ function PlanCard({ plan, onGetNames, onClick, onEdit, onDelete }: PlanCardProps
     onDelete();
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      onClick();
+    }
+  };
+
   return (
-    <button
-      type="button"
+    <div
+      role="button"
+      tabIndex={0}
       onClick={onClick}
+      onKeyDown={handleKeyDown}
       className="w-full text-left bg-gray-900 rounded-lg p-5 border border-gray-800 hover:border-gray-700 transition-colors cursor-pointer group focus:outline-none focus:ring-2 focus:ring-blue-500"
     >
       <div className="flex items-start justify-between mb-2">
         <h3 className="text-lg font-semibold text-white">{plan.name}</h3>
         <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
           <button
+            type="button"
             onClick={handleEdit}
             className="p-1.5 text-gray-400 hover:text-white hover:bg-gray-800 rounded"
             aria-label={`Edit ${plan.name}`}
@@ -251,6 +261,7 @@ function PlanCard({ plan, onGetNames, onClick, onEdit, onDelete }: PlanCardProps
             </svg>
           </button>
           <button
+            type="button"
             onClick={handleDelete}
             className="p-1.5 text-red-400 hover:text-red-300 hover:bg-red-900/30 rounded"
             aria-label={`Delete ${plan.name}`}
@@ -299,6 +310,6 @@ function PlanCard({ plan, onGetNames, onClick, onEdit, onDelete }: PlanCardProps
           </span>
         )}
       </div>
-    </button>
+    </div>
   );
 }

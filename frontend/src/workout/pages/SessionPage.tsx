@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useWorkoutProviders } from '../hooks';
-import { SetList, SetLoggingForm } from '../components';
+import { PlanSelectionPanel, PlannedExercisesPanel, SetList, SetLoggingForm } from '../components';
 import type { WorkoutSession, WorkoutSet, WeightUnit } from '../types';
 
 export function WorkoutSessionPage() {
@@ -11,6 +11,7 @@ export function WorkoutSessionPage() {
   const [sessionSets, setSessionSets] = useState<WorkoutSet[]>([]);
   const [loading, setLoading] = useState(true);
   const [endingSession, setEndingSession] = useState(false);
+  const [showPlanSelection, setShowPlanSelection] = useState(false);
 
   const loadActiveSession = useCallback(async () => {
     setLoading(true);
@@ -27,10 +28,11 @@ export function WorkoutSessionPage() {
     loadActiveSession();
   }, [loadActiveSession]);
 
-  const handleStartSession = async () => {
-    const session = await sessions.create();
+  const handleStartSession = async (planId?: string) => {
+    const session = await sessions.create(planId);
     setActiveSession(session);
     setSessionSets([]);
+    setShowPlanSelection(false);
   };
 
   const handleEndSession = async () => {
@@ -91,6 +93,11 @@ export function WorkoutSessionPage() {
               <p className="text-gray-400 mt-1">
                 Started at {new Date(activeSession.startedAt).toLocaleTimeString()} ({sessionDuration} min)
               </p>
+              {activeSession.plan && (
+                <p className="text-blue-400 text-sm mt-1">
+                  Plan: {activeSession.plan.name}
+                </p>
+              )}
             </div>
             <div className="flex items-center gap-3">
               <div className="text-right">
@@ -108,12 +115,21 @@ export function WorkoutSessionPage() {
           </div>
         </div>
 
+        {activeSession.plan && (
+          <PlannedExercisesPanel
+            plan={activeSession.plan}
+            sessionSets={sessionSets}
+            onQuickAdd={handleLogSet}
+          />
+        )}
+
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <div className="bg-gray-900 rounded-lg p-6 border border-gray-800">
             <h3 className="text-lg font-semibold text-white mb-4">Log Set</h3>
             <SetLoggingForm
               onSubmit={handleLogSet}
               lastSet={sessionSets.length > 0 ? sessionSets[sessionSets.length - 1] : null}
+              allowedExerciseIds={activeSession.plan?.exerciseIds}
             />
           </div>
 
@@ -126,6 +142,34 @@ export function WorkoutSessionPage() {
     );
   }
 
+  if (showPlanSelection) {
+    return (
+      <div className="space-y-6">
+        <div className="bg-gray-900 rounded-lg p-6 border border-gray-800">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-2xl font-bold text-white mb-2">Choose a Plan</h2>
+              <p className="text-gray-400">
+                Select a training plan to guide your workout, or start a blank session.
+              </p>
+            </div>
+            <button
+              onClick={() => setShowPlanSelection(false)}
+              className="px-4 py-2 bg-gray-800 hover:bg-gray-700 text-gray-300 rounded-lg transition-colors"
+            >
+              Back
+            </button>
+          </div>
+        </div>
+
+        <PlanSelectionPanel
+          onStartWithPlan={(planId) => handleStartSession(planId)}
+          onStartWithoutPlan={() => handleStartSession()}
+        />
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       <div className="bg-gray-900 rounded-lg p-8 border border-gray-800 text-center">
@@ -133,12 +177,20 @@ export function WorkoutSessionPage() {
         <p className="text-gray-400 mb-6">
           Start a new workout session to begin logging your exercises.
         </p>
-        <button
-          onClick={handleStartSession}
-          className="px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium text-lg transition-colors"
-        >
-          Start Workout
-        </button>
+        <div className="flex flex-col sm:flex-row gap-3 justify-center">
+          <button
+            onClick={() => handleStartSession()}
+            className="px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium text-lg transition-colors"
+          >
+            Start Workout
+          </button>
+          <button
+            onClick={() => setShowPlanSelection(true)}
+            className="px-8 py-4 bg-gray-800 hover:bg-gray-700 text-white rounded-lg font-medium text-lg transition-colors border border-gray-700"
+          >
+            Start from Plan
+          </button>
+        </div>
       </div>
 
       <div className="bg-gray-900 rounded-lg p-6 border border-gray-800">

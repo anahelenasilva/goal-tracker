@@ -43,7 +43,7 @@ function mapExercise(data: Record<string, unknown>): Exercise {
   return {
     id: data.id as string,
     name: data.name as string,
-    namePt: data.namePt as string,
+    namePt: (data.namePt || data.name_pt) as string,
     category: data.category as Exercise['category'],
     isCustom: data.isCustom as boolean,
     createdAt: data.createdAt as string,
@@ -57,6 +57,8 @@ function mapWorkoutSession(data: Record<string, unknown>): WorkoutSession {
     status: data.status as WorkoutSession['status'],
     startedAt: data.startedAt as string,
     endedAt: data.endedAt as string | undefined,
+    planId: data.planId as string | undefined,
+    plan: data.plan ? mapTrainingPlan(data.plan as Record<string, unknown>) : undefined,
     createdAt: data.createdAt as string,
     updatedAt: data.updatedAt as string,
   };
@@ -180,9 +182,11 @@ class ApiWorkoutSessionProvider implements WorkoutSessionProvider {
     return data.map(mapWorkoutSession);
   }
 
-  async create(): Promise<WorkoutSession> {
+  async create(planId?: string): Promise<WorkoutSession> {
     const response = await fetch(`${this.baseUrl}/workouts/sessions`, {
       method: 'POST',
+      headers: planId ? { 'Content-Type': 'application/json' } : undefined,
+      body: planId ? JSON.stringify({ planId }) : undefined,
     });
     const data = await handleResponse<Record<string, unknown>>(response);
     return mapWorkoutSession(data);

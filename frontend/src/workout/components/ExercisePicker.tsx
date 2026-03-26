@@ -7,9 +7,10 @@ interface ExercisePickerProps {
   value: Exercise | null;
   onChange: (exercise: Exercise) => void;
   placeholder?: string;
+  allowedExerciseIds?: string[];
 }
 
-export function ExercisePicker({ value, onChange, placeholder = 'Select exercise...' }: ExercisePickerProps) {
+export function ExercisePicker({ value, onChange, placeholder = 'Select exercise...', allowedExerciseIds }: ExercisePickerProps) {
   const { exercises } = useWorkoutProviders();
   const [allExercises, setAllExercises] = useState<Exercise[]>([]);
   const [query, setQuery] = useState('');
@@ -40,12 +41,16 @@ export function ExercisePicker({ value, onChange, placeholder = 'Select exercise
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  const baseExercises = allowedExerciseIds
+    ? allExercises.filter((e) => allowedExerciseIds.includes(e.id))
+    : allExercises;
+
   const filteredExercises = query
-    ? allExercises.filter((e) =>
+    ? baseExercises.filter((e) =>
         e.name.toLowerCase().includes(query.toLowerCase()) ||
         e.namePt?.toLowerCase().includes(query.toLowerCase())
       )
-    : allExercises;
+    : baseExercises;
 
   const groupedExercises = filteredExercises.reduce(
     (acc, exercise) => {
