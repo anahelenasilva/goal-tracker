@@ -43,7 +43,7 @@ function mapExercise(data: Record<string, unknown>): Exercise {
   return {
     id: data.id as string,
     name: data.name as string,
-    namePt: data.namePt as string,
+    namePt: (data.namePt || data.name_pt) as string,
     category: data.category as Exercise['category'],
     isCustom: data.isCustom as boolean,
     createdAt: data.createdAt as string,

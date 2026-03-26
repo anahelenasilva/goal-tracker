@@ -174,7 +174,11 @@ export class WorkoutsService {
       sessionId,
       notes: data.notes ?? null,
     });
-    return this.workoutSetsRepository.save(set);
+    const saved = await this.workoutSetsRepository.save(set);
+    return this.workoutSetsRepository.findOne({
+      where: { id: saved.id },
+      relations: ['exercise'],
+    }) as Promise<WorkoutSet>;
   }
 
   async updateSet(id: string, data: UpdateWorkoutSetDto): Promise<WorkoutSet> {

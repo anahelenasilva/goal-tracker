@@ -242,8 +242,10 @@ describe('WorkoutsService', () => {
         exercisesRepository.findOne.mockResolvedValue(exercise);
 
         const newSet = makeSet();
+        const setWithExercise = { ...newSet, exercise };
         workoutSetsRepository.create.mockReturnValue(newSet);
         workoutSetsRepository.save.mockResolvedValue(newSet);
+        workoutSetsRepository.findOne.mockResolvedValue(setWithExercise);
 
         const result = await service.addSet('session-1', {
           exerciseId: 'exercise-1',
@@ -252,7 +254,11 @@ describe('WorkoutsService', () => {
           weightUnit: 'kg',
         });
 
-        expect(result).toEqual(newSet);
+        expect(result).toEqual(setWithExercise);
+        expect(workoutSetsRepository.findOne).toHaveBeenCalledWith({
+          where: { id: newSet.id },
+          relations: ['exercise'],
+        });
       });
 
       it('should throw NotFoundException when session does not exist', async () => {
