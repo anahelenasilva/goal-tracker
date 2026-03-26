@@ -149,8 +149,17 @@ export class WorkoutSchema1742856000000 implements MigrationInterface {
         ('Leg Curl', 'Mesa Flexora', 'legs', false),
         ('Leg Extension', 'Cadeira Extensora', 'legs', false),
         ('Calf Raises', 'Elevação de Panturrilha', 'legs', false),
-        ('Plank', 'Prancha', 'core', false),
-        ('Crunches', 'Abdominal', 'core', false),
+        ('Plank', 'Prancha Frontal', 'core', false),
+        ('Crunch', 'Abdominal Reto (Tradicional)', 'core', false),
+        ('Sit-up', 'Abdominal Completo', 'core', false),
+        ('Bicycle Crunch', 'Abdominal Bicicleta', 'core', false),
+        ('Jackknife', 'Abdominal Canivete', 'core', false),
+        ('Reverse Crunch', 'Abdominal Infra', 'core', false),
+        ('Oblique Crunch', 'Abdominal Oblíquo', 'core', false),
+        ('Heel Touch', 'Toque no Calcanhar (Tic-Tac)', 'core', false),
+        ('Mountain Climber', 'Escalador', 'core', false),
+        ('Scissor Kick', 'Abdominal Tesoura', 'core', false),
+        ('Dead Bug', 'Dead Bug', 'core', false),
         ('Russian Twists', 'Rotação Russa', 'core', false),
         ('Leg Raises', 'Elevação de Pernas', 'core', false),
         ('Running', 'Corrida', 'cardio', false),
@@ -159,7 +168,13 @@ export class WorkoutSchema1742856000000 implements MigrationInterface {
         ('Jump Rope', 'Pular Corda', 'cardio', false),
         ('Burpees', 'Burpees', 'full_body', false),
         ('Clean and Press', 'Arremesso e Desenvolvimento', 'full_body', false),
-        ('Kettlebell Swing', 'Swing com Kettlebell', 'full_body', false)
+        ('Kettlebell Swing', 'Swing com Kettlebell', 'full_body', false),
+        ('Tricep Kickback', 'Tríceps Coice', 'triceps', false),
+        ('Wall Sit', 'Agachamento Isométrico na Parede', 'legs', false),
+        ('Lateral Walk', 'Deslocamento Lateral com Elástico', 'legs', false),
+        ('Barbell Wrist Curl', 'Rosca de Punho com Barra', 'other', false),
+        ('Glute Bridge', 'Elevação Pélvica', 'legs', false),
+        ('Box Step-up', 'Subida no Caixote', 'legs', false)
       ON CONFLICT DO NOTHING
     `);
   }
