@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import type { WorkoutSet } from '../types';
 
 interface SetListProps {
@@ -35,7 +36,9 @@ export function SetList({ sets, onDelete }: SetListProps) {
         <div key={exerciseId} className="bg-gray-800 rounded-lg overflow-hidden">
           <div className="px-4 py-3 bg-gray-750 border-b border-gray-700">
             <h3 className="font-semibold text-white">
-              {getExerciseName(exerciseId)}
+              <Link to={`/workout/graphs/${exerciseId}`} className="hover:text-blue-400 transition-colors">
+                {getExerciseName(exerciseId)}
+              </Link>
             </h3>
           </div>
           <div className="divide-y divide-gray-700">

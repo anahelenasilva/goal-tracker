@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useWorkoutProviders } from '../hooks';
 import { SetList, SetLoggingForm } from '../components';
 import type { WorkoutSession, WorkoutSet, WeightUnit } from '../types';
@@ -144,18 +144,18 @@ export function WorkoutSessionPage() {
       <div className="bg-gray-900 rounded-lg p-6 border border-gray-800">
         <h3 className="text-lg font-semibold text-white mb-4">Quick Actions</h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="bg-gray-800 rounded-lg p-4 text-center">
+          <Link to="/workout/plans" className="bg-gray-800 rounded-lg p-4 text-center hover:bg-gray-700 transition-colors">
             <div className="text-gray-400">Training Plans</div>
             <div className="text-white font-medium">Browse Plans</div>
-          </div>
-          <div className="bg-gray-800 rounded-lg p-4 text-center">
+          </Link>
+          <Link to="/workout/history" className="bg-gray-800 rounded-lg p-4 text-center hover:bg-gray-700 transition-colors">
             <div className="text-gray-400">Recent Workouts</div>
             <div className="text-white font-medium">View History</div>
-          </div>
-          <div className="bg-gray-800 rounded-lg p-4 text-center">
+          </Link>
+          <Link to="/workout/timer" className="bg-gray-800 rounded-lg p-4 text-center hover:bg-gray-700 transition-colors">
             <div className="text-gray-400">Rest Timer</div>
             <div className="text-white font-medium">Open Timer</div>
-          </div>
+          </Link>
         </div>
       </div>
     </div>
