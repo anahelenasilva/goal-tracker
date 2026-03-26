@@ -124,7 +124,7 @@ describe('WorkoutsService', () => {
         expect(result.endedAt).toBeNull();
         expect(workoutSessionsRepository.findOne).toHaveBeenCalledWith({
           where: { status: 'active' },
-          relations: ['plan'],
+          relations: ['plan', 'plan.planExercises', 'plan.planExercises.exercise'],
           order: { startedAt: 'DESC' },
         });
       });

@@ -72,11 +72,15 @@ export class WorkoutsService {
   }
 
   async getActiveSession(): Promise<WorkoutSession | null> {
-    return this.workoutSessionsRepository.findOne({
+    const session = await this.workoutSessionsRepository.findOne({
       where: { status: 'active' },
-      relations: ['plan'],
+      relations: ['plan', 'plan.planExercises', 'plan.planExercises.exercise'],
       order: { startedAt: 'DESC' },
     });
+    if (session?.plan) {
+      session.plan = this.toPlanView(session.plan);
+    }
+    return session;
   }
 
   async getSessions(): Promise<WorkoutSession[]> {
@@ -88,10 +92,13 @@ export class WorkoutsService {
   async getSessionById(id: string): Promise<WorkoutSession> {
     const session = await this.workoutSessionsRepository.findOne({
       where: { id },
-      relations: ['plan'],
+      relations: ['plan', 'plan.planExercises', 'plan.planExercises.exercise'],
     });
     if (!session) {
       throw new NotFoundException(`Session with ID ${id} not found`);
+    }
+    if (session.plan) {
+      session.plan = this.toPlanView(session.plan);
     }
     return session;
   }
