@@ -202,7 +202,8 @@ export function GraphsPage() {
   }
 
   const filteredExercises = allExercises.filter(e =>
-    e.name.toLowerCase().includes(exerciseFilter.toLowerCase())
+    e.name.toLowerCase().includes(exerciseFilter.toLowerCase()) ||
+    e.namePt?.toLowerCase().includes(exerciseFilter.toLowerCase())
   );
 
   const stats = progressData.length > 0

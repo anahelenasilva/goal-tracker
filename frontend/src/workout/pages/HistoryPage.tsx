@@ -361,7 +361,8 @@ export function HistoryPage() {
   }
 
   const filteredExercises = allExercises.filter(e =>
-    e.name.toLowerCase().includes(exerciseFilter.toLowerCase())
+    e.name.toLowerCase().includes(exerciseFilter.toLowerCase()) ||
+    e.namePt?.toLowerCase().includes(exerciseFilter.toLowerCase())
   );
 
   const exercisesWithHistory = filteredExercises.filter(exercise =>

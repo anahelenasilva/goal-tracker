@@ -41,7 +41,10 @@ export function ExercisePicker({ value, onChange, placeholder = 'Select exercise
   }, []);
 
   const filteredExercises = query
-    ? allExercises.filter((e) => e.name.toLowerCase().includes(query.toLowerCase()))
+    ? allExercises.filter((e) =>
+        e.name.toLowerCase().includes(query.toLowerCase()) ||
+        e.namePt?.toLowerCase().includes(query.toLowerCase())
+      )
     : allExercises;
 
   const groupedExercises = filteredExercises.reduce(

@@ -40,6 +40,7 @@ export function ExercisesPage() {
   const filteredExercises = searchQuery
     ? allExercises.filter((e) =>
         e.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        e.namePt?.toLowerCase().includes(searchQuery.toLowerCase()) ||
         e.category.toLowerCase().includes(searchQuery.toLowerCase())
       )
     : allExercises;
