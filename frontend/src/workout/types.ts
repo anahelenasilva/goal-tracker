@@ -17,6 +17,7 @@ export type WorkoutSessionStatus = 'active' | 'completed' | 'abandoned';
 export interface Exercise {
   id: string;
   name: string;
+  namePt: string;
   category: ExerciseCategory;
   isCustom: boolean;
   createdAt: string;

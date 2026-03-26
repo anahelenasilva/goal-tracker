@@ -22,6 +22,12 @@ export class UpdateExerciseDto {
   name?: string;
 
   @IsOptional()
+  @IsString()
+  @MinLength(1)
+  @MaxLength(120)
+  namePt?: string;
+
+  @IsOptional()
   @IsIn(EXERCISE_CATEGORIES)
   category?: ExerciseCategory;
 
