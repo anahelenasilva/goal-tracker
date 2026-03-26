@@ -157,7 +157,13 @@ class ApiWorkoutSessionProvider implements WorkoutSessionProvider {
   async getActive(): Promise<WorkoutSession | null> {
     const response = await fetch(`${this.baseUrl}/workouts/sessions/active`);
     if (response.status === 404) return null;
-    const data = await handleResponse<Record<string, unknown>>(response);
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({ message: 'Request failed' }));
+      throw new Error(error.message || `HTTP error ${response.status}`);
+    }
+    const text = await response.text();
+    if (!text) return null;
+    const data = JSON.parse(text);
     return data ? mapWorkoutSession(data) : null;
   }
 
