@@ -362,6 +362,7 @@ function AddExerciseModal({ existingIds, onSelect, onClose, loading }: AddExerci
   const filtered = query
     ? availableExercises.filter((e) =>
         e.name.toLowerCase().includes(query.toLowerCase()) ||
+        e.namePt?.toLowerCase().includes(query.toLowerCase()) ||
         e.category.toLowerCase().includes(query.toLowerCase())
       )
     : availableExercises;

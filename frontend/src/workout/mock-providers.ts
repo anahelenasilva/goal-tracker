@@ -50,7 +50,10 @@ class MockExerciseProvider implements ExerciseProvider {
 
   async search(query: string): Promise<Exercise[]> {
     const lower = query.toLowerCase();
-    return this.exercises.filter((e) => e.name.toLowerCase().includes(lower));
+    return this.exercises.filter((e) =>
+      e.name.toLowerCase().includes(lower) ||
+      e.namePt?.toLowerCase().includes(lower)
+    );
   }
 
   async create(data: Omit<Exercise, 'id' | 'createdAt' | 'updatedAt'>): Promise<Exercise> {
