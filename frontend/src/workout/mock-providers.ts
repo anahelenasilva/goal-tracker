@@ -25,16 +25,16 @@ function now(): string {
 }
 
 const mockExercises: Exercise[] = [
-  { id: 'ex-1', name: 'Bench Press', category: 'chest', isCustom: false, createdAt: now(), updatedAt: now() },
-  { id: 'ex-2', name: 'Squat', category: 'legs', isCustom: false, createdAt: now(), updatedAt: now() },
-  { id: 'ex-3', name: 'Deadlift', category: 'back', isCustom: false, createdAt: now(), updatedAt: now() },
-  { id: 'ex-4', name: 'Overhead Press', category: 'shoulders', isCustom: false, createdAt: now(), updatedAt: now() },
-  { id: 'ex-5', name: 'Barbell Row', category: 'back', isCustom: false, createdAt: now(), updatedAt: now() },
-  { id: 'ex-6', name: 'Pull-ups', category: 'back', isCustom: false, createdAt: now(), updatedAt: now() },
-  { id: 'ex-7', name: 'Bicep Curls', category: 'biceps', isCustom: false, createdAt: now(), updatedAt: now() },
-  { id: 'ex-8', name: 'Tricep Pushdown', category: 'triceps', isCustom: false, createdAt: now(), updatedAt: now() },
-  { id: 'ex-9', name: 'Leg Press', category: 'legs', isCustom: false, createdAt: now(), updatedAt: now() },
-  { id: 'ex-10', name: 'Plank', category: 'core', isCustom: false, createdAt: now(), updatedAt: now() },
+  { id: 'ex-1', name: 'Bench Press', namePt: 'Supino Reto', category: 'chest', isCustom: false, createdAt: now(), updatedAt: now() },
+  { id: 'ex-2', name: 'Squat', namePt: 'Agachamento', category: 'legs', isCustom: false, createdAt: now(), updatedAt: now() },
+  { id: 'ex-3', name: 'Deadlift', namePt: 'Levantamento Terra', category: 'back', isCustom: false, createdAt: now(), updatedAt: now() },
+  { id: 'ex-4', name: 'Overhead Press', namePt: 'Desenvolvimento', category: 'shoulders', isCustom: false, createdAt: now(), updatedAt: now() },
+  { id: 'ex-5', name: 'Barbell Row', namePt: 'Remada com Barra', category: 'back', isCustom: false, createdAt: now(), updatedAt: now() },
+  { id: 'ex-6', name: 'Pull-ups', namePt: 'Barra Fixa', category: 'back', isCustom: false, createdAt: now(), updatedAt: now() },
+  { id: 'ex-7', name: 'Bicep Curls', namePt: 'Rosca Direta', category: 'biceps', isCustom: false, createdAt: now(), updatedAt: now() },
+  { id: 'ex-8', name: 'Tricep Pushdown', namePt: 'Tríceps na Polia', category: 'triceps', isCustom: false, createdAt: now(), updatedAt: now() },
+  { id: 'ex-9', name: 'Leg Press', namePt: 'Leg Press', category: 'legs', isCustom: false, createdAt: now(), updatedAt: now() },
+  { id: 'ex-10', name: 'Plank', namePt: 'Prancha', category: 'core', isCustom: false, createdAt: now(), updatedAt: now() },
 ];
 
 class MockExerciseProvider implements ExerciseProvider {

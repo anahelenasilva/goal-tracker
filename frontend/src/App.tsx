@@ -1,7 +1,7 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { Dashboard } from './pages/Dashboard';
 import {
-  createMockProviders,
+  createApiProviders,
   ExercisesPage,
   GraphsPage,
   HistoryPage,
@@ -13,11 +13,11 @@ import {
   WorkoutSessionPage,
 } from './workout';
 
-const mockProviders = createMockProviders();
+const apiProviders = createApiProviders();
 
 function App() {
   return (
-    <WorkoutProvidersProvider providers={mockProviders}>
+    <WorkoutProvidersProvider providers={apiProviders}>
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Dashboard />} />

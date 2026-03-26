@@ -1,3 +1,4 @@
+export { createApiProviders } from './api-providers';
 export { useWorkoutProviders } from './hooks';
 export { WorkoutProvidersProvider } from './context';
 export { createMockProviders } from './mock-providers';
