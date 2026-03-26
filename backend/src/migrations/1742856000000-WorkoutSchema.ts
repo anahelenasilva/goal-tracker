@@ -6,7 +6,7 @@ export class WorkoutSchema1742856000000 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     // Create exercises table
     await queryRunner.query(`
-      CREATE TABLE "exercises" (
+      CREATE TABLE IF NOT EXISTS "exercises" (
         "id" uuid NOT NULL DEFAULT uuid_generate_v4(),
         "name" character varying NOT NULL,
         "category" character varying NOT NULL,
@@ -19,7 +19,7 @@ export class WorkoutSchema1742856000000 implements MigrationInterface {
 
     // Create workout_sessions table
     await queryRunner.query(`
-      CREATE TABLE "workout_sessions" (
+      CREATE TABLE IF NOT EXISTS "workout_sessions" (
         "id" uuid NOT NULL DEFAULT uuid_generate_v4(),
         "status" character varying NOT NULL,
         "started_at" TIMESTAMP WITH TIME ZONE NOT NULL,
@@ -32,7 +32,7 @@ export class WorkoutSchema1742856000000 implements MigrationInterface {
 
     // Create training_plans table
     await queryRunner.query(`
-      CREATE TABLE "training_plans" (
+      CREATE TABLE IF NOT EXISTS "training_plans" (
         "id" uuid NOT NULL DEFAULT uuid_generate_v4(),
         "name" character varying NOT NULL,
         "description" character varying,
@@ -45,7 +45,7 @@ export class WorkoutSchema1742856000000 implements MigrationInterface {
 
     // Create workout_sets table
     await queryRunner.query(`
-      CREATE TABLE "workout_sets" (
+      CREATE TABLE IF NOT EXISTS "workout_sets" (
         "id" uuid NOT NULL DEFAULT uuid_generate_v4(),
         "session_id" uuid NOT NULL,
         "exercise_id" uuid NOT NULL,
@@ -60,7 +60,7 @@ export class WorkoutSchema1742856000000 implements MigrationInterface {
 
     // Create training_plan_exercises table
     await queryRunner.query(`
-      CREATE TABLE "training_plan_exercises" (
+      CREATE TABLE IF NOT EXISTS "training_plan_exercises" (
         "id" uuid NOT NULL DEFAULT uuid_generate_v4(),
         "plan_id" uuid NOT NULL,
         "exercise_id" uuid NOT NULL,
@@ -70,53 +70,56 @@ export class WorkoutSchema1742856000000 implements MigrationInterface {
     `);
 
     // Create indexes
+    await queryRunner.query(`CREATE INDEX IF NOT EXISTS "idx_exercises_name" ON "exercises" ("name")`);
+    await queryRunner.query(`CREATE INDEX IF NOT EXISTS "idx_exercises_category" ON "exercises" ("category")`);
+    await queryRunner.query(`CREATE INDEX IF NOT EXISTS "idx_workout_sessions_status" ON "workout_sessions" ("status")`);
+    await queryRunner.query(`CREATE INDEX IF NOT EXISTS "idx_workout_sessions_started_at" ON "workout_sessions" ("started_at")`);
+    await queryRunner.query(`CREATE INDEX IF NOT EXISTS "idx_workout_sets_session_id" ON "workout_sets" ("session_id")`);
+    await queryRunner.query(`CREATE INDEX IF NOT EXISTS "idx_workout_sets_exercise_id" ON "workout_sets" ("exercise_id")`);
+    await queryRunner.query(`CREATE INDEX IF NOT EXISTS "idx_training_plan_exercises_plan_id" ON "training_plan_exercises" ("plan_id")`);
+
+    // Add foreign key constraints (idempotent)
     await queryRunner.query(`
-      CREATE INDEX "idx_exercises_name" ON "exercises" ("name")
+      DO $$
+      BEGIN
+        IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'FK_workout_sets_session') THEN
+          ALTER TABLE "workout_sets" ADD CONSTRAINT "FK_workout_sets_session"
+          FOREIGN KEY ("session_id") REFERENCES "workout_sessions"("id") ON DELETE CASCADE ON UPDATE NO ACTION;
+        END IF;
+      END $$
     `);
     await queryRunner.query(`
-      CREATE INDEX "idx_exercises_category" ON "exercises" ("category")
+      DO $$
+      BEGIN
+        IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'FK_workout_sets_exercise') THEN
+          ALTER TABLE "workout_sets" ADD CONSTRAINT "FK_workout_sets_exercise"
+          FOREIGN KEY ("exercise_id") REFERENCES "exercises"("id") ON DELETE RESTRICT ON UPDATE NO ACTION;
+        END IF;
+      END $$
     `);
     await queryRunner.query(`
-      CREATE INDEX "idx_workout_sessions_status" ON "workout_sessions" ("status")
+      DO $$
+      BEGIN
+        IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'FK_training_plan_exercises_plan') THEN
+          ALTER TABLE "training_plan_exercises" ADD CONSTRAINT "FK_training_plan_exercises_plan"
+          FOREIGN KEY ("plan_id") REFERENCES "training_plans"("id") ON DELETE CASCADE ON UPDATE NO ACTION;
+        END IF;
+      END $$
     `);
     await queryRunner.query(`
-      CREATE INDEX "idx_workout_sessions_started_at" ON "workout_sessions" ("started_at")
-    `);
-    await queryRunner.query(`
-      CREATE INDEX "idx_workout_sets_session_id" ON "workout_sets" ("session_id")
-    `);
-    await queryRunner.query(`
-      CREATE INDEX "idx_workout_sets_exercise_id" ON "workout_sets" ("exercise_id")
-    `);
-    await queryRunner.query(`
-      CREATE INDEX "idx_training_plan_exercises_plan_id" ON "training_plan_exercises" ("plan_id")
+      DO $$
+      BEGIN
+        IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'FK_training_plan_exercises_exercise') THEN
+          ALTER TABLE "training_plan_exercises" ADD CONSTRAINT "FK_training_plan_exercises_exercise"
+          FOREIGN KEY ("exercise_id") REFERENCES "exercises"("id") ON DELETE RESTRICT ON UPDATE NO ACTION;
+        END IF;
+      END $$
     `);
 
-    // Add foreign key constraints
+    // Insert built-in exercises (idempotent - only insert if not exists)
     await queryRunner.query(`
-      ALTER TABLE "workout_sets"
-      ADD CONSTRAINT "FK_workout_sets_session"
-      FOREIGN KEY ("session_id") REFERENCES "workout_sessions"("id") ON DELETE CASCADE ON UPDATE NO ACTION
-    `);
-    await queryRunner.query(`
-      ALTER TABLE "workout_sets"
-      ADD CONSTRAINT "FK_workout_sets_exercise"
-      FOREIGN KEY ("exercise_id") REFERENCES "exercises"("id") ON DELETE RESTRICT ON UPDATE NO ACTION
-    `);
-    await queryRunner.query(`
-      ALTER TABLE "training_plan_exercises"
-      ADD CONSTRAINT "FK_training_plan_exercises_plan"
-      FOREIGN KEY ("plan_id") REFERENCES "training_plans"("id") ON DELETE CASCADE ON UPDATE NO ACTION
-    `);
-    await queryRunner.query(`
-      ALTER TABLE "training_plan_exercises"
-      ADD CONSTRAINT "FK_training_plan_exercises_exercise"
-      FOREIGN KEY ("exercise_id") REFERENCES "exercises"("id") ON DELETE RESTRICT ON UPDATE NO ACTION
-    `);
-
-    // Insert built-in exercises
-    await queryRunner.query(`
-      INSERT INTO "exercises" ("name", "category", "is_custom") VALUES
+      INSERT INTO "exercises" ("name", "category", "is_custom")
+      VALUES
         ('Bench Press', 'chest', false),
         ('Incline Dumbbell Press', 'chest', false),
         ('Cable Flyes', 'chest', false),
@@ -156,30 +159,31 @@ export class WorkoutSchema1742856000000 implements MigrationInterface {
         ('Burpees', 'full_body', false),
         ('Clean and Press', 'full_body', false),
         ('Kettlebell Swing', 'full_body', false)
+      ON CONFLICT DO NOTHING
     `);
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
     // Drop foreign key constraints
-    await queryRunner.query(`ALTER TABLE "training_plan_exercises" DROP CONSTRAINT "FK_training_plan_exercises_exercise"`);
-    await queryRunner.query(`ALTER TABLE "training_plan_exercises" DROP CONSTRAINT "FK_training_plan_exercises_plan"`);
-    await queryRunner.query(`ALTER TABLE "workout_sets" DROP CONSTRAINT "FK_workout_sets_exercise"`);
-    await queryRunner.query(`ALTER TABLE "workout_sets" DROP CONSTRAINT "FK_workout_sets_session"`);
+    await queryRunner.query(`ALTER TABLE IF EXISTS "training_plan_exercises" DROP CONSTRAINT IF EXISTS "FK_training_plan_exercises_exercise"`);
+    await queryRunner.query(`ALTER TABLE IF EXISTS "training_plan_exercises" DROP CONSTRAINT IF EXISTS "FK_training_plan_exercises_plan"`);
+    await queryRunner.query(`ALTER TABLE IF EXISTS "workout_sets" DROP CONSTRAINT IF EXISTS "FK_workout_sets_exercise"`);
+    await queryRunner.query(`ALTER TABLE IF EXISTS "workout_sets" DROP CONSTRAINT IF EXISTS "FK_workout_sets_session"`);
 
     // Drop indexes
-    await queryRunner.query(`DROP INDEX "idx_training_plan_exercises_plan_id"`);
-    await queryRunner.query(`DROP INDEX "idx_workout_sets_exercise_id"`);
-    await queryRunner.query(`DROP INDEX "idx_workout_sets_session_id"`);
-    await queryRunner.query(`DROP INDEX "idx_workout_sessions_started_at"`);
-    await queryRunner.query(`DROP INDEX "idx_workout_sessions_status"`);
-    await queryRunner.query(`DROP INDEX "idx_exercises_category"`);
-    await queryRunner.query(`DROP INDEX "idx_exercises_name"`);
+    await queryRunner.query(`DROP INDEX IF EXISTS "idx_training_plan_exercises_plan_id"`);
+    await queryRunner.query(`DROP INDEX IF EXISTS "idx_workout_sets_exercise_id"`);
+    await queryRunner.query(`DROP INDEX IF EXISTS "idx_workout_sets_session_id"`);
+    await queryRunner.query(`DROP INDEX IF EXISTS "idx_workout_sessions_started_at"`);
+    await queryRunner.query(`DROP INDEX IF EXISTS "idx_workout_sessions_status"`);
+    await queryRunner.query(`DROP INDEX IF EXISTS "idx_exercises_category"`);
+    await queryRunner.query(`DROP INDEX IF EXISTS "idx_exercises_name"`);
 
     // Drop tables
-    await queryRunner.query(`DROP TABLE "training_plan_exercises"`);
-    await queryRunner.query(`DROP TABLE "workout_sets"`);
-    await queryRunner.query(`DROP TABLE "training_plans"`);
-    await queryRunner.query(`DROP TABLE "workout_sessions"`);
-    await queryRunner.query(`DROP TABLE "exercises"`);
+    await queryRunner.query(`DROP TABLE IF EXISTS "training_plan_exercises"`);
+    await queryRunner.query(`DROP TABLE IF EXISTS "workout_sets"`);
+    await queryRunner.query(`DROP TABLE IF EXISTS "training_plans"`);
+    await queryRunner.query(`DROP TABLE IF EXISTS "workout_sessions"`);
+    await queryRunner.query(`DROP TABLE IF EXISTS "exercises"`);
   }
 }
