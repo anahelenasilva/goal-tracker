@@ -22,8 +22,21 @@ async function handleResponse<T>(response: Response): Promise<T> {
     const error = await response.json().catch(() => ({ message: 'Request failed' }));
     throw new Error(error.message || `HTTP error ${response.status}`);
   }
+  if (response.status === 204) {
+    return undefined as T;
+  }
   const text = await response.text();
-  return text ? JSON.parse(text) : null;
+  if (!text) {
+    throw new Error('Empty response body');
+  }
+  return JSON.parse(text);
+}
+
+async function handleEmptyResponse(response: Response): Promise<void> {
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({ message: 'Request failed' }));
+    throw new Error(error.message || `HTTP error ${response.status}`);
+  }
 }
 
 function mapExercise(data: Record<string, unknown>): Exercise {
@@ -130,7 +143,7 @@ class ApiExerciseProvider implements ExerciseProvider {
     const response = await fetch(`${this.baseUrl}/workouts/exercises/${id}`, {
       method: 'DELETE',
     });
-    await handleResponse<void>(response);
+    await handleEmptyResponse(response);
   }
 }
 
@@ -226,7 +239,7 @@ class ApiWorkoutSetProvider implements WorkoutSetProvider {
     const response = await fetch(`${this.baseUrl}/workouts/sets/${id}`, {
       method: 'DELETE',
     });
-    await handleResponse<void>(response);
+    await handleEmptyResponse(response);
   }
 }
 
@@ -274,7 +287,7 @@ class ApiTrainingPlanProvider implements TrainingPlanProvider {
     const response = await fetch(`${this.baseUrl}/workouts/plans/${id}`, {
       method: 'DELETE',
     });
-    await handleResponse<void>(response);
+    await handleEmptyResponse(response);
   }
 
   async addExercise(planId: string, exerciseId: string): Promise<TrainingPlan> {
