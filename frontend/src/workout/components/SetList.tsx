@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import type { WorkoutSet } from '../types';
+import { getExerciseDisplayName } from '../utils';
 
 interface SetListProps {
   sets: WorkoutSet[];
@@ -19,7 +20,7 @@ export function SetList({ sets, onDelete }: SetListProps) {
 
   const getExerciseName = (exerciseId: string): string => {
     const exercise = sets.find((s) => s.exercise?.id === exerciseId)?.exercise;
-    return exercise?.name || 'Unknown Exercise';
+    return exercise ? getExerciseDisplayName(exercise) : 'Unknown Exercise';
   };
 
   if (sets.length === 0) {
