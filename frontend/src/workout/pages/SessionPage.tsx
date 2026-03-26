@@ -129,6 +129,7 @@ export function WorkoutSessionPage() {
             <SetLoggingForm
               onSubmit={handleLogSet}
               lastSet={sessionSets.length > 0 ? sessionSets[sessionSets.length - 1] : null}
+              allowedExerciseIds={activeSession.plan?.exerciseIds}
             />
           </div>
 

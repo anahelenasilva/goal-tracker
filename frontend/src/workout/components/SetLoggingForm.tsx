@@ -11,9 +11,10 @@ interface SetLoggingFormProps {
     notes?: string;
   }) => Promise<void>;
   lastSet?: WorkoutSet | null;
+  allowedExerciseIds?: string[];
 }
 
-export function SetLoggingForm({ onSubmit, lastSet }: SetLoggingFormProps) {
+export function SetLoggingForm({ onSubmit, lastSet, allowedExerciseIds }: SetLoggingFormProps) {
   const [selectedExercise, setSelectedExercise] = useState<Exercise | null>(null);
   const [reps, setReps] = useState<string>(lastSet?.reps.toString() || '');
   const [weight, setWeight] = useState<string>(lastSet?.weight.toString() || '');
@@ -80,6 +81,7 @@ export function SetLoggingForm({ onSubmit, lastSet }: SetLoggingFormProps) {
           value={selectedExercise}
           onChange={setSelectedExercise}
           placeholder="Select an exercise..."
+          allowedExerciseIds={allowedExerciseIds}
         />
       </div>
 
