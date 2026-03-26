@@ -376,18 +376,6 @@ describe('WorkoutsController', () => {
       });
     });
 
-    describe('GET /workouts/plans/:id/full', () => {
-      it('should return a plan with full exercise data', async () => {
-        const plan = makePlan();
-        service.getPlanById.mockResolvedValue(plan);
-
-        const result = await controller.getPlanFull('plan-1');
-
-        expect(result).toEqual(plan);
-        expect(service.getPlanById).toHaveBeenCalledWith('plan-1');
-      });
-    });
-
     describe('POST /workouts/plans', () => {
       it('should create a new plan', async () => {
         const dto = { name: 'Push Day', exerciseIds: ['exercise-1'] };

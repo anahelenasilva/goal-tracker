@@ -123,11 +123,6 @@ export class WorkoutsController {
     return this.workoutsService.getPlanById(id);
   }
 
-  @Get('plans/:id/full')
-  async getPlanFull(@Param('id') id: string): Promise<TrainingPlan> {
-    return this.workoutsService.getPlanById(id);
-  }
-
   @Post('plans')
   async createPlan(@Body() dto: CreateTrainingPlanDto): Promise<TrainingPlan> {
     return this.workoutsService.createPlan(dto);
