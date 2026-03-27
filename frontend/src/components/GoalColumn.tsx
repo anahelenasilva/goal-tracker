@@ -83,7 +83,7 @@ export function GoalColumn({ goal, onEntryAdded }: GoalColumnProps) {
         <h2 className="text-2xl font-bold text-white capitalize mb-2">
           {goal.title}
         </h2>
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <span className="text-gray-400 text-sm">
             Total entries: <span className="font-semibold text-gray-200">{count}</span>
           </span>
@@ -91,17 +91,17 @@ export function GoalColumn({ goal, onEntryAdded }: GoalColumnProps) {
             <button
               onClick={handleAddYesterdayEntry}
               disabled={hasEntryYesterday || loading}
-              className={`px-4 py-2 rounded-md font-medium transition-colors ${hasEntryYesterday || loading
+              className={`flex-1 sm:flex-none px-3 py-2 rounded-md font-medium text-sm transition-colors ${hasEntryYesterday || loading
                 ? 'bg-gray-700 text-gray-500 cursor-not-allowed'
                 : 'bg-purple-600 text-white hover:bg-purple-500'
                 }`}
             >
-              {loading ? 'Adding...' : hasEntryYesterday ? 'Logged Yesterday' : 'Log Yesterday'}
+              {loading ? 'Adding...' : hasEntryYesterday ? 'Logged Yesterday' : 'Yesterday'}
             </button>
             <button
               onClick={handleAddEntry}
               disabled={hasEntryToday || loading}
-              className={`px-4 py-2 rounded-md font-medium transition-colors ${hasEntryToday || loading
+              className={`flex-1 sm:flex-none px-3 py-2 rounded-md font-medium text-sm transition-colors ${hasEntryToday || loading
                 ? 'bg-gray-700 text-gray-500 cursor-not-allowed'
                 : 'bg-blue-600 text-white hover:bg-blue-500'
                 }`}
