@@ -86,11 +86,11 @@ export function WorkoutSessionPage() {
 
     return (
       <div className="space-y-6">
-        <div className="bg-gray-900 rounded-lg p-6 border border-gray-800">
-          <div className="flex items-center justify-between flex-wrap gap-4">
+        <div className="bg-gray-900 rounded-lg p-4 sm:p-6 border border-gray-800">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
-              <h2 className="text-2xl font-bold text-white">Active Workout</h2>
-              <p className="text-gray-400 mt-1">
+              <h2 className="text-xl sm:text-2xl font-bold text-white">Active Workout</h2>
+              <p className="text-gray-400 mt-1 text-sm sm:text-base">
                 Started at {new Date(activeSession.startedAt).toLocaleTimeString()} ({sessionDuration} min)
               </p>
               {activeSession.plan && (
@@ -99,17 +99,17 @@ export function WorkoutSessionPage() {
                 </p>
               )}
             </div>
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 self-end sm:self-auto">
               <div className="text-right">
-                <div className="text-2xl font-bold text-white">{sessionSets.length}</div>
-                <div className="text-sm text-gray-400">sets</div>
+                <div className="text-xl sm:text-2xl font-bold text-white">{sessionSets.length}</div>
+                <div className="text-xs sm:text-sm text-gray-400">sets</div>
               </div>
               <button
                 onClick={handleEndSession}
                 disabled={endingSession}
-                className="px-6 py-3 bg-red-600 hover:bg-red-700 disabled:bg-gray-700 disabled:text-gray-400 text-white rounded-lg font-medium transition-colors"
+                className="px-4 sm:px-6 py-2 sm:py-3 bg-red-600 hover:bg-red-700 disabled:bg-gray-700 disabled:text-gray-400 text-white rounded-lg font-medium transition-colors"
               >
-                {endingSession ? 'Ending...' : 'End Workout'}
+                {endingSession ? 'Ending...' : 'End'}
               </button>
             </div>
           </div>
