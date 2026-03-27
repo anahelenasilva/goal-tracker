@@ -124,6 +124,7 @@ export class WorkoutSchema1742856000000 implements MigrationInterface {
         ('Bench Press', 'Supino Reto', 'chest', false),
         ('Incline Dumbbell Press', 'Supino Inclinado com Halteres', 'chest', false),
         ('Cable Flyes', 'Crucifixo no Cabo', 'chest', false),
+        ('Dumbbell Fly', 'Supino Fly (Crucifixo com Halteres)', 'chest', false),
         ('Push-ups', 'Flexão de Braços', 'chest', false),
         ('Deadlift', 'Levantamento Terra', 'back', false),
         ('Barbell Row', 'Remada com Barra', 'back', false),
@@ -138,10 +139,12 @@ export class WorkoutSchema1742856000000 implements MigrationInterface {
         ('Dumbbell Curl', 'Rosca Direta com Halteres', 'biceps', false),
         ('Hammer Curl', 'Rosca Martelo', 'biceps', false),
         ('Preacher Curl', 'Rosca Scott', 'biceps', false),
+        ('Cable Bicep Curl', 'Rosca Bíceps na Polia', 'biceps', false),
         ('Tricep Pushdown', 'Tríceps na Polia', 'triceps', false),
         ('Skull Crushers', 'Tríceps Testa', 'triceps', false),
         ('Dips', 'Mergulho', 'triceps', false),
         ('Overhead Tricep Extension', 'Tríceps Francês', 'triceps', false),
+        ('Good Morning', 'Good Morning', 'legs', false),
         ('Squat', 'Agachamento', 'legs', false),
         ('Leg Press', 'Leg Press', 'legs', false),
         ('Lunges', 'Avanço', 'legs', false),
@@ -174,7 +177,10 @@ export class WorkoutSchema1742856000000 implements MigrationInterface {
         ('Lateral Walk', 'Deslocamento Lateral com Elástico', 'legs', false),
         ('Barbell Wrist Curl', 'Rosca de Punho com Barra', 'other', false),
         ('Glute Bridge', 'Elevação Pélvica', 'legs', false),
-        ('Box Step-up', 'Subida no Caixote', 'legs', false)
+        ('Box Step-up', 'Subida no Caixote', 'legs', false),
+        ('Hip Abduction Machine', 'Cadeira Abdutora', 'legs', false),
+        ('Seated Leg Curl', 'Cadeira Flexora', 'legs', false),
+        ('Hip Adduction Machine', 'Cadeira Adutora', 'legs', false)
       ON CONFLICT DO NOTHING
     `);
   }
