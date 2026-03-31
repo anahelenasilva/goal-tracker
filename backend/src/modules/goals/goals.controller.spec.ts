@@ -106,10 +106,10 @@ describe('GoalsController', () => {
 
       service.createEntry.mockResolvedValue(newEntry);
 
-      const result = await controller.createEntry('1');
+      const result = await controller.createEntry('1', {});
 
       expect(result).toEqual(newEntry);
-      expect(service.createEntry).toHaveBeenCalledWith('1');
+      expect(service.createEntry).toHaveBeenCalledWith('1', undefined);
     });
   });
 });

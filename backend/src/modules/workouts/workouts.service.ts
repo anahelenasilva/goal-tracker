@@ -33,7 +33,7 @@ export class WorkoutsService {
     private trainingPlansRepository: Repository<TrainingPlan>,
     @InjectRepository(TrainingPlanExercise)
     private trainingPlanExercisesRepository: Repository<TrainingPlanExercise>,
-  ) {}
+  ) { }
 
   async getExercises(query?: string): Promise<Exercise[]> {
     if (query) {
@@ -204,9 +204,11 @@ export class WorkoutsService {
       where: { id },
       relations: ['session']
     });
-    if (!set) {
+
+    if (!set || !set.session) {
       throw new NotFoundException(`Set with ID ${id} not found`);
     }
+
     if (set.session.status === 'abandoned') {
       throw new ConflictException('Cannot delete set from an abandoned session');
     }

@@ -274,9 +274,10 @@ describe('WorkoutsService', () => {
         ).rejects.toThrow(NotFoundException);
       });
 
-      it('should throw ConflictException when adding set to a completed session', async () => {
-        const session = makeSession({ status: 'completed', endedAt: new Date() });
+      it('should throw ConflictException when adding set to an abandoned session', async () => {
+        const session = makeSession({ status: 'abandoned', endedAt: new Date() });
         workoutSessionsRepository.findOne.mockResolvedValue(session);
+        exercisesRepository.findOne.mockResolvedValue(makeExercise());
 
         await expect(
           service.addSet('session-1', {
@@ -286,6 +287,28 @@ describe('WorkoutsService', () => {
             weightUnit: 'kg',
           }),
         ).rejects.toThrow(ConflictException);
+      });
+
+      it('should allow adding set to a completed session', async () => {
+        const session = makeSession({ status: 'completed', endedAt: new Date() });
+        const exercise = makeExercise();
+        workoutSessionsRepository.findOne.mockResolvedValue(session);
+        exercisesRepository.findOne.mockResolvedValue(exercise);
+
+        const newSet = makeSet();
+        const setWithExercise = { ...newSet, exercise };
+        workoutSetsRepository.create.mockReturnValue(newSet);
+        workoutSetsRepository.save.mockResolvedValue(newSet);
+        workoutSetsRepository.findOne.mockResolvedValue(setWithExercise);
+
+        const result = await service.addSet('session-1', {
+          exerciseId: 'exercise-1',
+          reps: 10,
+          weight: 100,
+          weightUnit: 'kg',
+        });
+
+        expect(result).toEqual(setWithExercise);
       });
 
       it('should throw NotFoundException when exercise does not exist', async () => {
@@ -347,12 +370,17 @@ describe('WorkoutsService', () => {
 
     describe('deleteSet', () => {
       it('should delete an existing set', async () => {
-        const existingSet = makeSet();
+        const session = makeSession({ status: 'active' });
+        const existingSet = makeSet({ session });
         workoutSetsRepository.findOne.mockResolvedValue(existingSet);
         workoutSetsRepository.remove.mockResolvedValue(existingSet);
 
         await service.deleteSet('set-1');
 
+        expect(workoutSetsRepository.findOne).toHaveBeenCalledWith({
+          where: { id: 'set-1' },
+          relations: ['session'],
+        });
         expect(workoutSetsRepository.remove).toHaveBeenCalledWith(existingSet);
       });
 
@@ -361,6 +389,16 @@ describe('WorkoutsService', () => {
 
         await expect(service.deleteSet('non-existent')).rejects.toThrow(
           NotFoundException,
+        );
+      });
+
+      it('should throw ConflictException when deleting set from an abandoned session', async () => {
+        const session = makeSession({ status: 'abandoned', endedAt: new Date() });
+        const existingSet = makeSet({ session });
+        workoutSetsRepository.findOne.mockResolvedValue(existingSet);
+
+        await expect(service.deleteSet('set-1')).rejects.toThrow(
+          ConflictException,
         );
       });
     });

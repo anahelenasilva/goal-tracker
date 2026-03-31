@@ -193,16 +193,19 @@ describe('GoalsService', () => {
       } as GoalEntry;
 
       goalsRepository.findOne.mockResolvedValue(goal);
-      goalEntriesRepository.findOne.mockResolvedValue(null); // No existing entry
+      goalEntriesRepository.count.mockResolvedValue(0);
       goalEntriesRepository.create.mockReturnValue(newEntry);
       goalEntriesRepository.save.mockResolvedValue(newEntry);
 
       const result = await service.createEntry('1');
 
       expect(result).toEqual(newEntry);
-      expect(goalEntriesRepository.create).toHaveBeenCalledWith({
-        goalId: '1',
-      });
+      expect(goalEntriesRepository.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          goalId: '1',
+          createdAt: expect.any(Date),
+        })
+      );
       expect(goalEntriesRepository.save).toHaveBeenCalledWith(newEntry);
     });
 
@@ -229,7 +232,7 @@ describe('GoalsService', () => {
       } as GoalEntry;
 
       goalsRepository.findOne.mockResolvedValue(goal);
-      goalEntriesRepository.findOne.mockResolvedValue(existingEntry);
+      goalEntriesRepository.count.mockResolvedValue(1);
 
       await expect(service.createEntry('1')).rejects.toThrow(ConflictException);
     });
