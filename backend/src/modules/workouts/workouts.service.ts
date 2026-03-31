@@ -33,7 +33,7 @@ export class WorkoutsService {
     private trainingPlansRepository: Repository<TrainingPlan>,
     @InjectRepository(TrainingPlanExercise)
     private trainingPlanExercisesRepository: Repository<TrainingPlanExercise>,
-  ) {}
+  ) { }
 
   async getExercises(query?: string): Promise<Exercise[]> {
     if (query) {
@@ -165,8 +165,8 @@ export class WorkoutsService {
 
   async addSet(sessionId: string, data: CreateWorkoutSetDto): Promise<WorkoutSet> {
     const session = await this.getSessionById(sessionId);
-    if (session.status !== 'active') {
-      throw new ConflictException('Cannot add set to a non-active session');
+    if (session.status === 'abandoned') {
+      throw new ConflictException('Cannot add set to an abandoned session');
     }
     await this.getExerciseById(data.exerciseId);
     const set = this.workoutSetsRepository.create({
@@ -200,9 +200,17 @@ export class WorkoutsService {
   }
 
   async deleteSet(id: string): Promise<void> {
-    const set = await this.workoutSetsRepository.findOne({ where: { id } });
-    if (!set) {
+    const set = await this.workoutSetsRepository.findOne({
+      where: { id },
+      relations: ['session']
+    });
+
+    if (!set || !set.session) {
       throw new NotFoundException(`Set with ID ${id} not found`);
+    }
+
+    if (set.session.status === 'abandoned') {
+      throw new ConflictException('Cannot delete set from an abandoned session');
     }
     await this.workoutSetsRepository.remove(set);
   }

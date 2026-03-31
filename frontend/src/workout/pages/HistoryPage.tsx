@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useWorkoutProviders } from '../hooks';
 import type { Exercise, ExerciseHistoryEntry, WorkoutSession, WorkoutSet } from '../types';
 import { getExerciseDisplayName } from '../utils';
+import { SetLoggingForm } from '../components/SetLoggingForm';
 
 function formatDateTime(isoString: string): string {
   return new Date(isoString).toLocaleString();
@@ -70,11 +71,24 @@ function SessionDetail({
   session,
   sets,
   onBack,
+  onAddSet,
+  onDeleteSet,
 }: {
   session: WorkoutSession;
   sets: WorkoutSet[];
   onBack: () => void;
+  onAddSet: (data: {
+    exerciseId: string;
+    reps: number;
+    weight: number;
+    weightUnit: 'kg' | 'lb';
+    notes?: string;
+  }) => Promise<void>;
+  onDeleteSet: (setId: string) => Promise<void>;
 }) {
+  const [isEditing, setIsEditing] = useState(false);
+  const [lastLoggedSet, setLastLoggedSet] = useState<WorkoutSet | null>(null);
+
   const groupedByExercise = sets.reduce(
     (acc, set) => {
       const key = set.exerciseId;
@@ -90,6 +104,30 @@ function SessionDetail({
     return exercise?.name || 'Unknown Exercise';
   };
 
+  const handleAddSet = async (data: {
+    exerciseId: string;
+    reps: number;
+    weight: number;
+    weightUnit: 'kg' | 'lb';
+    notes?: string;
+  }) => {
+    await onAddSet(data);
+    setLastLoggedSet({
+      id: '',
+      exerciseId: data.exerciseId,
+      sessionId: session.id,
+      reps: data.reps,
+      weight: data.weight,
+      weightUnit: data.weightUnit,
+      notes: data.notes || '',
+      createdAt: new Date().toISOString(),
+    } as WorkoutSet);
+  };
+
+  const handleDeleteSet = async (setId: string) => {
+    await onDeleteSet(setId);
+  };
+
   return (
     <div className="space-y-4">
       <button
@@ -100,7 +138,21 @@ function SessionDetail({
       </button>
 
       <div className="bg-gray-900 rounded-lg p-6 border border-gray-800">
-        <h2 className="text-xl font-bold text-white mb-2">Workout Session</h2>
+        <div className="flex items-center justify-between mb-2">
+          <h2 className="text-xl font-bold text-white">Workout Session</h2>
+          {session.status === 'completed' && (
+            <button
+              onClick={() => setIsEditing(!isEditing)}
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                isEditing
+                  ? 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                  : 'bg-blue-600 text-white hover:bg-blue-700'
+              }`}
+            >
+              {isEditing ? 'Done' : 'Edit'}
+            </button>
+          )}
+        </div>
         <div className="grid grid-cols-2 gap-4 text-sm">
           <div>
             <span className="text-gray-400">Started:</span>
@@ -125,6 +177,13 @@ function SessionDetail({
         </div>
       </div>
 
+      {isEditing && (
+        <div className="bg-gray-900 rounded-lg p-6 border border-gray-800">
+          <h3 className="text-lg font-semibold text-white mb-4">Add Set</h3>
+          <SetLoggingForm onSubmit={handleAddSet} lastSet={lastLoggedSet} />
+        </div>
+      )}
+
       {Object.entries(groupedByExercise).map(([exerciseId, exerciseSets]) => (
         <div key={exerciseId} className="bg-gray-900 rounded-lg border border-gray-800 overflow-hidden">
           <div className="px-4 py-3 bg-gray-800 border-b border-gray-700">
@@ -139,11 +198,21 @@ function SessionDetail({
                     {set.reps} reps @ {set.weight}{set.weightUnit}
                   </span>
                 </div>
-                {set.notes && (
-                  <span className="text-gray-400 text-sm truncate max-w-32">
-                    {set.notes}
-                  </span>
-                )}
+                <div className="flex items-center gap-2">
+                  {set.notes && (
+                    <span className="text-gray-400 text-sm truncate max-w-32">
+                      {set.notes}
+                    </span>
+                  )}
+                  {isEditing && (
+                    <button
+                      onClick={() => handleDeleteSet(set.id)}
+                      className="px-2 py-1 text-red-400 hover:text-red-300 text-sm"
+                    >
+                      Delete
+                    </button>
+                  )}
+                </div>
               </div>
             ))}
           </div>
@@ -244,6 +313,26 @@ export function HistoryPage() {
   const [selectedEntry, setSelectedEntry] = useState<ExerciseHistoryEntry | null>(null);
   const [exerciseFilter, setExerciseFilter] = useState('');
 
+  async function handleAddSet(sessionId: string, data: {
+    exerciseId: string;
+    reps: number;
+    weight: number;
+    weightUnit: 'kg' | 'lb';
+    notes?: string;
+  }) {
+    await sets.add(sessionId, data);
+    const updated = await sets.getBySession(sessionId);
+    setSessionSets(prev => ({ ...prev, [sessionId]: updated }));
+  }
+
+  async function handleDeleteSet(sessionId: string, setId: string) {
+    await sets.delete(setId);
+    setSessionSets(prev => ({
+      ...prev,
+      [sessionId]: prev[sessionId].filter(s => s.id !== setId),
+    }));
+  }
+
   useEffect(() => {
     let cancelled = false;
 
@@ -306,6 +395,8 @@ export function HistoryPage() {
           session={selectedSession}
           sets={sessionSets[selectedSession.id] || []}
           onBack={() => setSelectedSession(null)}
+          onAddSet={(data) => handleAddSet(selectedSession.id, data)}
+          onDeleteSet={(setId) => handleDeleteSet(selectedSession.id, setId)}
         />
       </div>
     );
