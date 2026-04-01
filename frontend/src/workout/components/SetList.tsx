@@ -32,16 +32,19 @@ export function SetList({ sets, onDelete }: SetListProps) {
 
   return (
     <div className="space-y-4">
-      {Object.entries(groupedByExercise).map(([exerciseId, exerciseSets]) => (
+      {Object.entries(groupedByExercise).map(([exerciseId, exerciseSets]) => {
+        const exercise = getExercise(exerciseId);
+        const englishName = exercise ? getExerciseEnglishName(exercise) : null;
+        return (
         <div key={exerciseId} className="bg-gray-800 rounded-lg overflow-hidden">
           <div className="px-4 py-3 bg-gray-750 border-b border-gray-700">
             <h3 className="font-semibold text-white">
               <Link to={`/workout/graphs/${exerciseId}`} className="hover:text-blue-400 transition-colors">
-                {getExercise(exerciseId) ? getExerciseDisplayName(getExercise(exerciseId)!) : 'Unknown Exercise'}
+                {exercise ? getExerciseDisplayName(exercise) : 'Unknown Exercise'}
               </Link>
             </h3>
-            {getExercise(exerciseId) && getExerciseEnglishName(getExercise(exerciseId)!) && (
-              <span className="text-xs text-gray-500">{getExerciseEnglishName(getExercise(exerciseId)!)}</span>
+            {englishName && (
+              <span className="text-xs text-gray-500">{englishName}</span>
             )}
           </div>
           <div className="divide-y divide-gray-700">
@@ -76,7 +79,8 @@ export function SetList({ sets, onDelete }: SetListProps) {
             ))}
           </div>
         </div>
-      ))}
+        );
+      })}
     </div>
   );
 }
