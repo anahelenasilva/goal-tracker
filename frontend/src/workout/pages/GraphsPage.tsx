@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useWorkoutProviders } from '../hooks';
 import type { Exercise, ExerciseProgressPoint } from '../types';
-import { getExerciseDisplayName } from '../utils';
+import { getExerciseDisplayName, getExerciseEnglishName } from '../utils';
 
 type Metric = 'weight' | 'reps' | 'volume';
 type Period = '7' | '30' | '90' | '365';
@@ -254,6 +254,7 @@ export function GraphsPage() {
               }`}
             >
               <div className="font-medium">{getExerciseDisplayName(exercise)}</div>
+              {getExerciseEnglishName(exercise) && <div className="text-xs text-gray-500">{getExerciseEnglishName(exercise)}</div>}
               <div className="text-sm text-gray-500 capitalize">{exercise.category}</div>
             </button>
           ))}

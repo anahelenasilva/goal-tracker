@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useWorkoutProviders } from '../hooks';
 import type { Exercise, TrainingPlan, WorkoutSet, WeightUnit } from '../types';
-import { getExerciseDisplayName } from '../utils';
+import { getExerciseDisplayName, getExerciseEnglishName } from '../utils';
 
 interface PlannedExercisesPanelProps {
   plan: TrainingPlan;
@@ -93,6 +93,9 @@ export function PlannedExercisesPanel({ plan, sessionSets, onQuickAdd }: Planned
                   <span className={`${started ? 'text-green-300' : 'text-white'}`}>
                     {getExerciseDisplayName(exercise)}
                   </span>
+                  {getExerciseEnglishName(exercise) && (
+                    <span className="text-xs text-gray-500 ml-2">{getExerciseEnglishName(exercise)}</span>
+                  )}
                   {started && (
                     <span className="text-green-400 text-xs ml-2">
                       {sets.length} {sets.length === 1 ? 'set' : 'sets'}

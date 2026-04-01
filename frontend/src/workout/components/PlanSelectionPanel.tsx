@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useWorkoutProviders } from '../hooks';
 import type { TrainingPlan } from '../types';
+import { getExerciseDisplayName } from '../utils';
 
 interface PlanSelectionPanelProps {
   onStartWithPlan: (planId: string) => void;
@@ -16,7 +17,7 @@ function getCurrentDayName(): string {
 export function PlanSelectionPanel({ onStartWithPlan, onStartWithoutPlan }: PlanSelectionPanelProps) {
   const { plans, exercises: exerciseProvider } = useWorkoutProviders();
   const [trainingPlans, setTrainingPlans] = useState<TrainingPlan[]>([]);
-  const [exerciseNames, setExerciseNames] = useState<Record<string, string[]>>({});
+  const [exerciseDisplayNames, setExerciseDisplayNames] = useState<Record<string, string[]>>({});
   const [loading, setLoading] = useState(true);
 
   const currentDay = getCurrentDayName();
@@ -32,11 +33,11 @@ export function PlanSelectionPanel({ onStartWithPlan, onStartWithoutPlan }: Plan
         const names: string[] = [];
         for (const id of plan.exerciseIds) {
           const exercise = await exerciseProvider.getById(id);
-          if (exercise) names.push(exercise.name);
+          if (exercise) names.push(getExerciseDisplayName(exercise));
         }
         namesMap[plan.id] = names;
       }
-      setExerciseNames(namesMap);
+      setExerciseDisplayNames(namesMap);
       setLoading(false);
     };
     load();
@@ -69,7 +70,7 @@ export function PlanSelectionPanel({ onStartWithPlan, onStartWithoutPlan }: Plan
               <PlanOptionCard
                 key={plan.id}
                 plan={plan}
-                exerciseNames={exerciseNames[plan.id] || []}
+                exerciseNames={exerciseDisplayNames[plan.id] || []}
                 highlighted
                 onSelect={() => onStartWithPlan(plan.id)}
               />
@@ -88,7 +89,7 @@ export function PlanSelectionPanel({ onStartWithPlan, onStartWithoutPlan }: Plan
               <PlanOptionCard
                 key={plan.id}
                 plan={plan}
-                exerciseNames={exerciseNames[plan.id] || []}
+                exerciseNames={exerciseDisplayNames[plan.id] || []}
                 onSelect={() => onStartWithPlan(plan.id)}
               />
             ))}
