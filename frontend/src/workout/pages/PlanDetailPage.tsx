@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useWorkoutProviders } from '../hooks';
 import type { Exercise, TrainingPlan } from '../types';
-import { getExerciseDisplayName } from '../utils';
+import { getExerciseDisplayName, getExerciseEnglishName } from '../utils';
 import { DeletePlanDialog, PlanFormModal } from '../components/PlanFormModal';
 
 export function PlanDetailPage() {
@@ -286,6 +286,7 @@ function ExerciseRow({ exercise, index, total, onRemove, onMoveUp, onMoveDown }:
       <span className="text-gray-500 text-sm w-6">{index + 1}</span>
       <div className="flex-1">
         <span className="text-white">{getExerciseDisplayName(exercise)}</span>
+        {getExerciseEnglishName(exercise) && <span className="text-xs text-gray-500 ml-2">{getExerciseEnglishName(exercise)}</span>}
       </div>
       <span
         className={`px-2 py-1 rounded text-xs ${categoryColors[exercise.category] || categoryColors.other}`}
@@ -427,7 +428,8 @@ function AddExerciseModal({ existingIds, onSelect, onClose, loading }: AddExerci
                         disabled={loading}
                         className="w-full px-3 py-2 text-left bg-gray-800 hover:bg-gray-700 rounded text-white text-sm disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                       >
-                        {getExerciseDisplayName(exercise)}
+                        <div>{getExerciseDisplayName(exercise)}</div>
+                        {getExerciseEnglishName(exercise) && <div className="text-xs text-gray-500">{getExerciseEnglishName(exercise)}</div>}
                       </button>
                     ))}
                   </div>

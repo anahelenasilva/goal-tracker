@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
-import type { WorkoutSet } from '../types';
-import { getExerciseDisplayName } from '../utils';
+import type { Exercise, WorkoutSet } from '../types';
+import { getExerciseDisplayName, getExerciseEnglishName } from '../utils';
 
 interface SetListProps {
   sets: WorkoutSet[];
@@ -18,9 +18,8 @@ export function SetList({ sets, onDelete }: SetListProps) {
     {} as Record<string, WorkoutSet[]>
   );
 
-  const getExerciseName = (exerciseId: string): string => {
-    const exercise = sets.find((s) => s.exercise?.id === exerciseId)?.exercise;
-    return exercise ? getExerciseDisplayName(exercise) : 'Unknown Exercise';
+  const getExercise = (exerciseId: string): Exercise | undefined => {
+    return sets.find((s) => s.exercise?.id === exerciseId)?.exercise;
   };
 
   if (sets.length === 0) {
@@ -33,14 +32,20 @@ export function SetList({ sets, onDelete }: SetListProps) {
 
   return (
     <div className="space-y-4">
-      {Object.entries(groupedByExercise).map(([exerciseId, exerciseSets]) => (
+      {Object.entries(groupedByExercise).map(([exerciseId, exerciseSets]) => {
+        const exercise = getExercise(exerciseId);
+        const englishName = exercise ? getExerciseEnglishName(exercise) : null;
+        return (
         <div key={exerciseId} className="bg-gray-800 rounded-lg overflow-hidden">
           <div className="px-4 py-3 bg-gray-750 border-b border-gray-700">
             <h3 className="font-semibold text-white">
               <Link to={`/workout/graphs/${exerciseId}`} className="hover:text-blue-400 transition-colors">
-                {getExerciseName(exerciseId)}
+                {exercise ? getExerciseDisplayName(exercise) : 'Unknown Exercise'}
               </Link>
             </h3>
+            {englishName && (
+              <span className="text-xs text-gray-500">{englishName}</span>
+            )}
           </div>
           <div className="divide-y divide-gray-700">
             {exerciseSets.map((set, index) => (
@@ -74,7 +79,8 @@ export function SetList({ sets, onDelete }: SetListProps) {
             ))}
           </div>
         </div>
-      ))}
+        );
+      })}
     </div>
   );
 }

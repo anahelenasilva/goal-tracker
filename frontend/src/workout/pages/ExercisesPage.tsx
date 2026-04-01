@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useWorkoutProviders } from '../hooks';
 import type { Exercise } from '../types';
-import { getExerciseDisplayName } from '../utils';
+import { getExerciseDisplayName, getExerciseEnglishName } from '../utils';
 import { DeleteConfirmationDialog, ExerciseFormModal } from '../components/ExerciseFormModal';
 
 export function ExercisesPage() {
@@ -246,7 +246,10 @@ function ExerciseCard({ exercise, onEdit, onDelete }: ExerciseCardProps) {
     <div className="bg-gray-900 rounded-lg p-4 border border-gray-800 hover:border-gray-700 transition-colors group">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <span className="text-white font-medium">{getExerciseDisplayName(exercise)}</span>
+          <div>
+            <span className="text-white font-medium">{getExerciseDisplayName(exercise)}</span>
+            {getExerciseEnglishName(exercise) && <span className="text-xs text-gray-500 ml-2">{getExerciseEnglishName(exercise)}</span>}
+          </div>
           {exercise.isCustom && (
             <span className="px-2 py-0.5 text-xs bg-blue-900/50 text-blue-300 rounded">
               Custom
