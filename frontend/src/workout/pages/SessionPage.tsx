@@ -51,6 +51,7 @@ export function WorkoutSessionPage() {
   const handleLogSet = async (data: {
     exerciseId: string;
     reps: number;
+    sets: number;
     weight: number | null;
     weightUnit: WeightUnit;
     notes?: string;
@@ -59,6 +60,7 @@ export function WorkoutSessionPage() {
     const newSet = await sets.add(activeSession.id, {
       exerciseId: data.exerciseId,
       reps: data.reps,
+      sets: data.sets,
       weight: data.weight,
       weightUnit: data.weightUnit,
       notes: data.notes,

@@ -172,6 +172,7 @@ class MockWorkoutSetProvider implements WorkoutSetProvider {
     const exercise = await this.exerciseProvider.getById(data.exerciseId);
     const set: WorkoutSet = {
       ...data,
+      sets: data.sets ?? 1,
       exercise: exercise || undefined,
       id: generateId(),
       sessionId,
@@ -370,7 +371,10 @@ class MockGraphProvider implements GraphProvider {
       if (exerciseSets.length > 0) {
         const maxWeight = Math.max(...exerciseSets.map(s => s.weight ?? 0));
         const maxReps = Math.max(...exerciseSets.map(s => s.reps));
-        const totalVolume = exerciseSets.reduce((sum, s) => sum + (s.weight ?? 0) * s.reps, 0);
+        const totalVolume = exerciseSets.reduce(
+          (sum, s) => sum + (s.weight ?? 0) * s.reps * s.sets,
+          0,
+        );
 
         points.push({
           date: session.startedAt,

@@ -428,7 +428,9 @@ export class WorkoutsService {
         weight: Math.max(...entry.points.map((point) => Number(point.weight))),
         reps: Math.max(...entry.points.map((point) => point.reps)),
         volume: entry.points.reduce(
-          (accumulator, point) => accumulator + Number(point.weight) * point.reps,
+          (accumulator, point) =>
+            accumulator +
+            Number(point.weight ?? 0) * point.reps * point.sets,
           0,
         ),
       }));

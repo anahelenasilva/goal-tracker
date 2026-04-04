@@ -6,6 +6,7 @@ interface SetLoggingFormProps {
   onSubmit: (data: {
     exerciseId: string;
     reps: number;
+    sets: number;
     weight: number | null;
     weightUnit: WeightUnit;
     notes?: string;
@@ -17,6 +18,7 @@ interface SetLoggingFormProps {
 export function SetLoggingForm({ onSubmit, lastSet, allowedExerciseIds }: SetLoggingFormProps) {
   const [selectedExercise, setSelectedExercise] = useState<Exercise | null>(null);
   const [reps, setReps] = useState<string>(lastSet?.reps.toString() || '');
+  const [sets, setSets] = useState<string>((lastSet?.sets ?? 1).toString());
   const [weight, setWeight] = useState<string>(
     lastSet?.weight != null ? lastSet.weight.toString() : '',
   );
@@ -35,11 +37,22 @@ export function SetLoggingForm({ onSubmit, lastSet, allowedExerciseIds }: SetLog
     }
 
     const repsNum = parseFloat(reps);
+    const setsTrimmed = sets.trim();
+    const setsNum = Number(setsTrimmed);
     const weightValue = weight.trim();
     const weightNum = weightValue === '' ? null : Number(weightValue);
 
     if (!reps || isNaN(repsNum) || repsNum <= 0) {
       setError('Please enter valid reps');
+      return;
+    }
+    if (
+      !setsTrimmed ||
+      !Number.isFinite(setsNum) ||
+      !Number.isInteger(setsNum) ||
+      setsNum < 1
+    ) {
+      setError('Please enter a valid set count');
       return;
     }
     if (
@@ -55,11 +68,13 @@ export function SetLoggingForm({ onSubmit, lastSet, allowedExerciseIds }: SetLog
       await onSubmit({
         exerciseId: selectedExercise.id,
         reps: repsNum,
+        sets: setsNum,
         weight: weightNum,
         weightUnit: unit,
         notes: notes.trim() || undefined,
       });
       setReps('');
+      setSets('1');
       setWeight('');
       setNotes('');
       setSelectedExercise(null);
@@ -73,6 +88,7 @@ export function SetLoggingForm({ onSubmit, lastSet, allowedExerciseIds }: SetLog
   const handleQuickFill = () => {
     if (lastSet) {
       setReps(lastSet.reps.toString());
+      setSets((lastSet.sets ?? 1).toString());
       setWeight(lastSet.weight != null ? lastSet.weight.toString() : '');
       setUnit(lastSet.weightUnit);
     }
@@ -90,7 +106,7 @@ export function SetLoggingForm({ onSubmit, lastSet, allowedExerciseIds }: SetLog
         />
       </div>
 
-      <div className="grid grid-cols-3 gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         <div>
           <label className="block text-sm font-medium text-gray-300 mb-1">Reps</label>
           <input
@@ -99,6 +115,19 @@ export function SetLoggingForm({ onSubmit, lastSet, allowedExerciseIds }: SetLog
             value={reps}
             onChange={(e) => setReps(e.target.value)}
             placeholder="10"
+            className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-300 mb-1">Sets</label>
+          <input
+            type="number"
+            inputMode="numeric"
+            min={1}
+            value={sets}
+            onChange={(e) => setSets(e.target.value)}
+            placeholder="1"
             className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>

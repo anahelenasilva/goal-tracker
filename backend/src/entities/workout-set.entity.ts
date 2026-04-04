@@ -25,6 +25,9 @@ export class WorkoutSet {
   @Column({ type: 'int' })
   reps: number;
 
+  @Column({ type: 'int', default: 1 })
+  sets: number;
+
   @Column({ type: 'decimal', precision: 10, scale: 2, nullable: true })
   weight: number | null;
 

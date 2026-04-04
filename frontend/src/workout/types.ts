@@ -30,6 +30,7 @@ export interface WorkoutSet {
   exerciseId: string;
   exercise?: Exercise;
   reps: number;
+  sets: number;
   weight: number | null;
   weightUnit: WeightUnit;
   notes?: string;
