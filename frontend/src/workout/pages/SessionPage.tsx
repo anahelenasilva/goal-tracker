@@ -51,7 +51,7 @@ export function WorkoutSessionPage() {
   const handleLogSet = async (data: {
     exerciseId: string;
     reps: number;
-    weight: number;
+    weight: number | null;
     weightUnit: WeightUnit;
     notes?: string;
   }) => {

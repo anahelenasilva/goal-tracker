@@ -261,6 +261,36 @@ describe('WorkoutsService', () => {
         });
       });
 
+      it('should add a set with null weight', async () => {
+        const session = makeSession({ status: 'active' });
+        const exercise = makeExercise();
+        workoutSessionsRepository.findOne.mockResolvedValue(session);
+        exercisesRepository.findOne.mockResolvedValue(exercise);
+
+        const newSet = makeSet({ weight: null });
+        const setWithExercise = { ...newSet, exercise };
+        workoutSetsRepository.create.mockReturnValue(newSet);
+        workoutSetsRepository.save.mockResolvedValue(newSet);
+        workoutSetsRepository.findOne.mockResolvedValue(setWithExercise);
+
+        const result = await service.addSet('session-1', {
+          exerciseId: 'exercise-1',
+          reps: 12,
+          weight: null,
+          weightUnit: 'kg',
+        });
+
+        expect(result.weight).toBeNull();
+        expect(workoutSetsRepository.create).toHaveBeenCalledWith(
+          expect.objectContaining({
+            exerciseId: 'exercise-1',
+            reps: 12,
+            weight: null,
+            weightUnit: 'kg',
+          }),
+        );
+      });
+
       it('should throw NotFoundException when session does not exist', async () => {
         workoutSessionsRepository.findOne.mockResolvedValue(null);
 
@@ -828,6 +858,36 @@ describe('WorkoutsService', () => {
         expect(result[0].weight).toBe(100);
         expect(result[0].reps).toBe(10);
         expect(result[0].volume).toBe(1000);
+      });
+
+      it('should treat null weight as zero in progress calculations', async () => {
+        const exercise = makeExercise();
+        const session = makeSession({ status: 'completed', startedAt: new Date() });
+        const bodyweightSet = makeSet({
+          id: 'set-1',
+          session,
+          exercise,
+          sessionId: session.id,
+          reps: 15,
+          weight: null,
+        });
+        const weightedSet = makeSet({
+          id: 'set-2',
+          session,
+          exercise,
+          sessionId: session.id,
+          reps: 8,
+          weight: 80,
+        });
+        exercisesRepository.findOne.mockResolvedValue(exercise);
+        workoutSetsRepository.find.mockResolvedValue([bodyweightSet, weightedSet]);
+
+        const result = await service.getExerciseProgress('exercise-1');
+
+        expect(result).toHaveLength(1);
+        expect(result[0].weight).toBe(80);
+        expect(result[0].reps).toBe(15);
+        expect(result[0].volume).toBe(640);
       });
 
       it('should only include sets from completed sessions within period', async () => {

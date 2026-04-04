@@ -71,7 +71,7 @@ function mapWorkoutSet(data: Record<string, unknown>): WorkoutSet {
     exerciseId: data.exerciseId as string,
     exercise: data.exercise ? mapExercise(data.exercise as Record<string, unknown>) : undefined,
     reps: data.reps as number,
-    weight: Number(data.weight),
+    weight: data.weight == null ? null : Number(data.weight),
     weightUnit: data.weightUnit as WorkoutSet['weightUnit'],
     notes: data.notes as string | undefined,
     createdAt: data.createdAt as string,
@@ -381,7 +381,7 @@ class ApiGraphProvider implements GraphProvider {
     const data = await handleResponse<Record<string, unknown>[]>(response);
     return data.map((point) => ({
       date: point.date as string,
-      weight: Number(point.weight),
+      weight: point.weight == null ? null : Number(point.weight),
       reps: point.reps as number,
       volume: point.volume as number,
     }));

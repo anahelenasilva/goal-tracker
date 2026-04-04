@@ -56,7 +56,7 @@ export function SetList({ sets, onDelete }: SetListProps) {
                 <div className="flex items-center gap-4">
                   <span className="text-gray-500 font-medium">#{index + 1}</span>
                   <span className="text-white">
-                    {set.reps} reps @ {set.weight}{set.weightUnit}
+                    {set.reps} reps{set.weight != null ? ` @ ${set.weight}${set.weightUnit}` : ''}
                   </span>
                   {set.notes && (
                     <span className="text-gray-400 text-sm truncate max-w-32">

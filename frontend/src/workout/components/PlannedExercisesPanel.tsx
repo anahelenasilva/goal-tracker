@@ -9,7 +9,7 @@ interface PlannedExercisesPanelProps {
   onQuickAdd: (data: {
     exerciseId: string;
     reps: number;
-    weight: number;
+    weight: number | null;
     weightUnit: WeightUnit;
     notes?: string;
   }) => Promise<void>;
@@ -136,7 +136,7 @@ interface QuickAddFormProps {
   onSubmit: (data: {
     exerciseId: string;
     reps: number;
-    weight: number;
+    weight: number | null;
     weightUnit: WeightUnit;
     notes?: string;
   }) => Promise<void>;
@@ -145,16 +145,31 @@ interface QuickAddFormProps {
 
 function QuickAddForm({ exercise, lastSet, onSubmit, onCancel }: QuickAddFormProps) {
   const [reps, setReps] = useState(lastSet?.reps.toString() || '');
-  const [weight, setWeight] = useState(lastSet?.weight.toString() || '');
+  const [weight, setWeight] = useState(
+    lastSet?.weight != null ? lastSet.weight.toString() : '',
+  );
   const [unit, setUnit] = useState<WeightUnit>(lastSet?.weightUnit || 'kg');
   const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError(null);
     const repsNum = parseFloat(reps);
-    const weightNum = parseFloat(weight);
-    if (!reps || isNaN(repsNum) || repsNum <= 0) return;
-    if (!weight || isNaN(weightNum) || weightNum <= 0) return;
+    const weightValue = weight.trim();
+    const weightNum = weightValue === '' ? null : Number(weightValue);
+
+    if (!reps || isNaN(repsNum) || repsNum <= 0) {
+      setError('Please enter valid reps');
+      return;
+    }
+    if (
+      weightNum !== null &&
+      (!Number.isFinite(weightNum) || weightNum < 0)
+    ) {
+      setError('Please enter valid weight');
+      return;
+    }
 
     setSubmitting(true);
     try {
@@ -222,6 +237,11 @@ function QuickAddForm({ exercise, lastSet, onSubmit, onCancel }: QuickAddFormPro
           Cancel
         </button>
       </div>
+      {error && (
+        <div className="mt-2 text-xs text-red-300" role="alert">
+          {error}
+        </div>
+      )}
     </form>
   );
 }
