@@ -48,6 +48,9 @@ export class WorkoutsService {
   }
 
   async getExerciseById(id: string): Promise<Exercise> {
+    if (!this.isValidUUID(id)) {
+      throw new NotFoundException(`Exercise with ID ${id} not found`);
+    }
     const exercise = await this.exercisesRepository.findOne({ where: { id } });
     if (!exercise) {
       throw new NotFoundException(`Exercise with ID ${id} not found`);
@@ -90,6 +93,9 @@ export class WorkoutsService {
   }
 
   async getSessionById(id: string): Promise<WorkoutSession> {
+    if (!this.isValidUUID(id)) {
+      throw new NotFoundException(`Session with ID ${id} not found`);
+    }
     const session = await this.workoutSessionsRepository.findOne({
       where: { id },
       relations: ['plan', 'plan.planExercises', 'plan.planExercises.exercise'],
@@ -165,8 +171,8 @@ export class WorkoutsService {
 
   async addSet(sessionId: string, data: CreateWorkoutSetDto): Promise<WorkoutSet> {
     const session = await this.getSessionById(sessionId);
-    if (session.status === 'abandoned') {
-      throw new ConflictException('Cannot add set to an abandoned session');
+    if (session.status !== 'active') {
+      throw new ConflictException('Cannot add set to a non-active session');
     }
     await this.getExerciseById(data.exerciseId);
     const set = this.workoutSetsRepository.create({
@@ -224,6 +230,9 @@ export class WorkoutsService {
   }
 
   async getPlanById(id: string): Promise<TrainingPlan> {
+    if (!this.isValidUUID(id)) {
+      throw new NotFoundException(`Plan with ID ${id} not found`);
+    }
     const plan = await this.trainingPlansRepository.findOne({
       where: { id },
       relations: ['planExercises', 'planExercises.exercise'],
@@ -478,6 +487,10 @@ export class WorkoutsService {
     if (reindexed.length > 0) {
       await this.trainingPlanExercisesRepository.save(reindexed);
     }
+  }
+
+  private isValidUUID(id: string): boolean {
+    return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
   }
 
   private toPlanView(plan: TrainingPlan): TrainingPlan {

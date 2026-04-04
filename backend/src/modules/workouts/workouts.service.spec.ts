@@ -10,8 +10,15 @@ import { WorkoutSession } from '../../entities/workout-session.entity';
 import { WorkoutSet } from '../../entities/workout-set.entity';
 import { WorkoutsService } from './workouts.service';
 
+const EXERCISE_ID = '11111111-1111-1111-1111-111111111111';
+const EXERCISE_ID_2 = '22222222-2222-2222-2222-222222222222';
+const SESSION_ID = '33333333-3333-3333-3333-333333333333';
+const PLAN_ID = '55555555-5555-5555-5555-555555555555';
+const PLAN_EXERCISE_ID = '66666666-6666-6666-6666-666666666666';
+const PLAN_EXERCISE_ID_2 = '77777777-7777-7777-7777-777777777777';
+
 const makeExercise = (overrides: Partial<Exercise> = {}): Exercise => ({
-  id: 'exercise-1',
+  id: EXERCISE_ID,
   name: 'Bench Press',
   namePt: 'Supino',
   category: 'chest',
@@ -26,7 +33,7 @@ const makeExercise = (overrides: Partial<Exercise> = {}): Exercise => ({
 const makeSession = (
   overrides: Partial<WorkoutSession> = {},
 ): WorkoutSession => ({
-  id: 'session-1',
+  id: SESSION_ID,
   status: 'active',
   startedAt: new Date(),
   endedAt: null,
@@ -40,8 +47,8 @@ const makeSession = (
 
 const makeSet = (overrides: Partial<WorkoutSet> = {}): WorkoutSet => ({
   id: 'set-1',
-  sessionId: 'session-1',
-  exerciseId: 'exercise-1',
+  sessionId: SESSION_ID,
+  exerciseId: EXERCISE_ID,
   reps: 10,
   sets: 1,
   weight: 100,
@@ -54,7 +61,7 @@ const makeSet = (overrides: Partial<WorkoutSet> = {}): WorkoutSet => ({
 });
 
 const makePlan = (overrides: Partial<TrainingPlan> = {}): TrainingPlan => ({
-  id: 'plan-1',
+  id: PLAN_ID,
   name: 'Push Day',
   description: null,
   assignedDays: null,
@@ -134,16 +141,16 @@ describe('WorkoutsService', () => {
       it('should create a session with a planId', async () => {
         workoutSessionsRepository.findOne
           .mockResolvedValueOnce(null)
-          .mockResolvedValueOnce(makeSession({ planId: 'plan-1' }));
+          .mockResolvedValueOnce(makeSession({ planId: PLAN_ID }));
         const plan = makePlan();
         trainingPlansRepository.findOne.mockResolvedValue(plan);
-        const newSession = makeSession({ planId: 'plan-1' });
+        const newSession = makeSession({ planId: PLAN_ID });
         workoutSessionsRepository.create.mockReturnValue(newSession);
         workoutSessionsRepository.save.mockResolvedValue(newSession);
 
-        const result = await service.createSession({ planId: 'plan-1' });
+        const result = await service.createSession({ planId: PLAN_ID });
 
-        expect(result.planId).toBe('plan-1');
+        expect(result.planId).toBe(PLAN_ID);
       });
 
       it('should throw NotFoundException when planId does not exist', async () => {
@@ -175,7 +182,7 @@ describe('WorkoutsService', () => {
           endedAt: new Date(),
         });
 
-        const result = await service.endSession('session-1');
+        const result = await service.endSession(SESSION_ID);
 
         expect(result.status).toBe('completed');
         expect(result.endedAt).not.toBeNull();
@@ -193,7 +200,7 @@ describe('WorkoutsService', () => {
         const session = makeSession({ status: 'completed', endedAt: new Date() });
         workoutSessionsRepository.findOne.mockResolvedValue(session);
 
-        await expect(service.endSession('session-1')).rejects.toThrow(
+        await expect(service.endSession(SESSION_ID)).rejects.toThrow(
           ConflictException,
         );
       });
@@ -202,7 +209,7 @@ describe('WorkoutsService', () => {
         const session = makeSession({ status: 'abandoned', endedAt: new Date() });
         workoutSessionsRepository.findOne.mockResolvedValue(session);
 
-        await expect(service.endSession('session-1')).rejects.toThrow(
+        await expect(service.endSession(SESSION_ID)).rejects.toThrow(
           ConflictException,
         );
       });
@@ -218,7 +225,7 @@ describe('WorkoutsService', () => {
           endedAt: new Date(),
         });
 
-        const result = await service.abandonSession('session-1');
+        const result = await service.abandonSession(SESSION_ID);
 
         expect(result.status).toBe('abandoned');
         expect(result.endedAt).not.toBeNull();
@@ -228,7 +235,7 @@ describe('WorkoutsService', () => {
         const session = makeSession({ status: 'completed', endedAt: new Date() });
         workoutSessionsRepository.findOne.mockResolvedValue(session);
 
-        await expect(service.abandonSession('session-1')).rejects.toThrow(
+        await expect(service.abandonSession(SESSION_ID)).rejects.toThrow(
           ConflictException,
         );
       });
@@ -249,8 +256,8 @@ describe('WorkoutsService', () => {
         workoutSetsRepository.save.mockResolvedValue(newSet);
         workoutSetsRepository.findOne.mockResolvedValue(setWithExercise);
 
-        const result = await service.addSet('session-1', {
-          exerciseId: 'exercise-1',
+        const result = await service.addSet(SESSION_ID, {
+          exerciseId: EXERCISE_ID,
           reps: 10,
           weight: 100,
           weightUnit: 'kg',
@@ -275,8 +282,8 @@ describe('WorkoutsService', () => {
         workoutSetsRepository.save.mockResolvedValue(newSet);
         workoutSetsRepository.findOne.mockResolvedValue(setWithExercise);
 
-        const result = await service.addSet('session-1', {
-          exerciseId: 'exercise-1',
+        const result = await service.addSet(SESSION_ID, {
+          exerciseId: EXERCISE_ID,
           reps: 12,
           weight: null,
           weightUnit: 'kg',
@@ -285,7 +292,7 @@ describe('WorkoutsService', () => {
         expect(result.weight).toBeNull();
         expect(workoutSetsRepository.create).toHaveBeenCalledWith(
           expect.objectContaining({
-            exerciseId: 'exercise-1',
+            exerciseId: EXERCISE_ID,
             reps: 12,
             weight: null,
             weightUnit: 'kg',
@@ -298,7 +305,7 @@ describe('WorkoutsService', () => {
 
         await expect(
           service.addSet('non-existent', {
-            exerciseId: 'exercise-1',
+            exerciseId: EXERCISE_ID,
             reps: 10,
             weight: 100,
             weightUnit: 'kg',
@@ -312,8 +319,8 @@ describe('WorkoutsService', () => {
         exercisesRepository.findOne.mockResolvedValue(makeExercise());
 
         await expect(
-          service.addSet('session-1', {
-            exerciseId: 'exercise-1',
+          service.addSet(SESSION_ID, {
+            exerciseId: EXERCISE_ID,
             reps: 10,
             weight: 100,
             weightUnit: 'kg',
@@ -321,26 +328,21 @@ describe('WorkoutsService', () => {
         ).rejects.toThrow(ConflictException);
       });
 
-      it('should allow adding set to a completed session', async () => {
+      it('should throw ConflictException when adding set to a completed session', async () => {
         const session = makeSession({ status: 'completed', endedAt: new Date() });
         const exercise = makeExercise();
         workoutSessionsRepository.findOne.mockResolvedValue(session);
         exercisesRepository.findOne.mockResolvedValue(exercise);
 
-        const newSet = makeSet();
-        const setWithExercise = { ...newSet, exercise };
-        workoutSetsRepository.create.mockReturnValue(newSet);
-        workoutSetsRepository.save.mockResolvedValue(newSet);
-        workoutSetsRepository.findOne.mockResolvedValue(setWithExercise);
-
-        const result = await service.addSet('session-1', {
-          exerciseId: 'exercise-1',
+        const addSetPromise = service.addSet(SESSION_ID, {
+          exerciseId: EXERCISE_ID,
           reps: 10,
           weight: 100,
           weightUnit: 'kg',
         });
 
-        expect(result).toEqual(setWithExercise);
+        await expect(addSetPromise).rejects.toThrow(ConflictException);
+        await expect(addSetPromise).rejects.toThrow('Cannot add set to a non-active session');
       });
 
       it('should throw NotFoundException when exercise does not exist', async () => {
@@ -349,7 +351,7 @@ describe('WorkoutsService', () => {
         exercisesRepository.findOne.mockResolvedValue(null);
 
         await expect(
-          service.addSet('session-1', {
+          service.addSet(SESSION_ID, {
             exerciseId: 'non-existent',
             reps: 10,
             weight: 100,
@@ -471,7 +473,7 @@ describe('WorkoutsService', () => {
         const exercise = makeExercise();
         exercisesRepository.findOne.mockResolvedValue(exercise);
 
-        const result = await service.getExerciseById('exercise-1');
+        const result = await service.getExerciseById(EXERCISE_ID);
 
         expect(result).toEqual(exercise);
       });
@@ -507,7 +509,7 @@ describe('WorkoutsService', () => {
         exercisesRepository.merge.mockReturnValue(updated);
         exercisesRepository.save.mockResolvedValue(updated);
 
-        const result = await service.updateExercise('exercise-1', { name: 'Updated Name' });
+        const result = await service.updateExercise(EXERCISE_ID, { name: 'Updated Name' });
 
         expect(result.name).toBe('Updated Name');
       });
@@ -527,7 +529,7 @@ describe('WorkoutsService', () => {
         exercisesRepository.findOne.mockResolvedValue(exercise);
         exercisesRepository.remove.mockResolvedValue(exercise);
 
-        await service.deleteExercise('exercise-1');
+        await service.deleteExercise(EXERCISE_ID);
 
         expect(exercisesRepository.remove).toHaveBeenCalledWith(exercise);
       });
@@ -562,9 +564,9 @@ describe('WorkoutsService', () => {
         const plan = makePlan();
         trainingPlansRepository.findOne.mockResolvedValue(plan);
 
-        const result = await service.getPlanById('plan-1') as PlanView;
+        const result = await service.getPlanById(PLAN_ID) as PlanView;
 
-        expect(result.id).toBe('plan-1');
+        expect(result.id).toBe(PLAN_ID);
         expect(result.name).toBe('Push Day');
         expect(result.exerciseIds).toEqual([]);
         expect(result.exercises).toEqual([]);
@@ -588,9 +590,9 @@ describe('WorkoutsService', () => {
         trainingPlansRepository.findOne.mockResolvedValue({ ...plan, planExercises: [] });
         exercisesRepository.findOne.mockResolvedValue(exercise);
         const planExerciseEntry = {
-          id: 'pe-1',
-          planId: 'plan-1',
-          exerciseId: 'exercise-1',
+          id: PLAN_EXERCISE_ID,
+          planId: PLAN_ID,
+          exerciseId: EXERCISE_ID,
           orderIndex: 0,
           plan: plan,
           exercise: exercise,
@@ -600,7 +602,7 @@ describe('WorkoutsService', () => {
 
         const result = await service.createPlan({
           name: 'Push Day',
-          exerciseIds: ['exercise-1'],
+          exerciseIds: [EXERCISE_ID],
         }) as PlanView;
 
         expect(result.name).toBe('Push Day');
@@ -628,7 +630,7 @@ describe('WorkoutsService', () => {
         trainingPlansRepository.merge.mockReturnValue(updatedPlan);
         trainingPlansRepository.save.mockResolvedValue(updatedPlan);
 
-        const result = await service.updatePlan('plan-1', { name: 'Updated' }) as PlanView;
+        const result = await service.updatePlan(PLAN_ID, { name: 'Updated' }) as PlanView;
 
         expect(result.name).toBe('Updated');
       });
@@ -648,7 +650,7 @@ describe('WorkoutsService', () => {
         trainingPlansRepository.findOne.mockResolvedValue(plan);
         trainingPlansRepository.remove.mockResolvedValue(plan);
 
-        await service.deletePlan('plan-1');
+        await service.deletePlan(PLAN_ID);
 
         expect(trainingPlansRepository.remove).toHaveBeenCalledWith(plan);
       });
@@ -670,9 +672,9 @@ describe('WorkoutsService', () => {
         exercisesRepository.findOne.mockResolvedValue(exercise);
         trainingPlanExercisesRepository.findOne.mockResolvedValue(null);
         const planExerciseEntry = {
-          id: 'pe-1',
-          planId: 'plan-1',
-          exerciseId: 'exercise-1',
+          id: PLAN_EXERCISE_ID,
+          planId: PLAN_ID,
+          exerciseId: EXERCISE_ID,
           orderIndex: 0,
           plan: plan,
           exercise: exercise,
@@ -680,7 +682,7 @@ describe('WorkoutsService', () => {
         trainingPlanExercisesRepository.create.mockReturnValue(planExerciseEntry);
         trainingPlanExercisesRepository.save.mockResolvedValue(planExerciseEntry);
 
-        await service.addPlanExercise('plan-1', { exerciseId: 'exercise-1' });
+        await service.addPlanExercise(PLAN_ID, { exerciseId: EXERCISE_ID });
 
         expect(trainingPlanExercisesRepository.save).toHaveBeenCalled();
       });
@@ -689,7 +691,7 @@ describe('WorkoutsService', () => {
         trainingPlansRepository.findOne.mockResolvedValue(null);
 
         await expect(
-          service.addPlanExercise('non-existent', { exerciseId: 'exercise-1' }),
+          service.addPlanExercise('non-existent', { exerciseId: EXERCISE_ID }),
         ).rejects.toThrow(NotFoundException);
       });
 
@@ -699,7 +701,7 @@ describe('WorkoutsService', () => {
         exercisesRepository.findOne.mockResolvedValue(null);
 
         await expect(
-          service.addPlanExercise('plan-1', { exerciseId: 'non-existent' }),
+          service.addPlanExercise(PLAN_ID, { exerciseId: 'non-existent' }),
         ).rejects.toThrow(NotFoundException);
       });
     });
@@ -709,9 +711,9 @@ describe('WorkoutsService', () => {
         const plan = makePlan();
         const exercise = makeExercise();
         const entry = {
-          id: 'pe-1',
-          planId: 'plan-1',
-          exerciseId: 'exercise-1',
+          id: PLAN_EXERCISE_ID,
+          planId: PLAN_ID,
+          exerciseId: EXERCISE_ID,
           orderIndex: 0,
           plan: plan,
           exercise: exercise,
@@ -722,7 +724,7 @@ describe('WorkoutsService', () => {
         trainingPlanExercisesRepository.find.mockResolvedValue([]);
         (trainingPlanExercisesRepository.save as jest.Mock).mockResolvedValue([]);
 
-        await service.removePlanExercise('plan-1', 'exercise-1');
+        await service.removePlanExercise(PLAN_ID, EXERCISE_ID);
 
         expect(trainingPlanExercisesRepository.remove).toHaveBeenCalledWith(entry);
       });
@@ -731,11 +733,11 @@ describe('WorkoutsService', () => {
     describe('reorderPlanExercises', () => {
       it('should reorder exercises in a plan', async () => {
         const plan = makePlan();
-        const exercise1 = makeExercise({ id: 'exercise-1' });
-        const exercise2 = makeExercise({ id: 'exercise-2' });
+        const exercise1 = makeExercise({ id: EXERCISE_ID });
+        const exercise2 = makeExercise({ id: EXERCISE_ID_2 });
         const entries = [
-          { id: 'pe-1', planId: 'plan-1', exerciseId: 'exercise-1', orderIndex: 0, plan, exercise: exercise1 },
-          { id: 'pe-2', planId: 'plan-1', exerciseId: 'exercise-2', orderIndex: 1, plan, exercise: exercise2 },
+          { id: PLAN_EXERCISE_ID, planId: PLAN_ID, exerciseId: EXERCISE_ID, orderIndex: 0, plan, exercise: exercise1 },
+          { id: PLAN_EXERCISE_ID_2, planId: PLAN_ID, exerciseId: EXERCISE_ID_2, orderIndex: 1, plan, exercise: exercise2 },
         ] as TrainingPlanExercise[];
         trainingPlansRepository.findOne.mockResolvedValue({ ...plan, planExercises: [] });
         trainingPlanExercisesRepository.find.mockResolvedValue(entries);
@@ -745,8 +747,8 @@ describe('WorkoutsService', () => {
         }) as TrainingPlanExercise);
         (trainingPlanExercisesRepository.save as jest.Mock).mockResolvedValue(entries);
 
-        await service.reorderPlanExercises('plan-1', {
-          exerciseIds: ['exercise-2', 'exercise-1'],
+        await service.reorderPlanExercises(PLAN_ID, {
+          exerciseIds: [EXERCISE_ID_2, EXERCISE_ID],
         });
 
         expect(trainingPlanExercisesRepository.save).toHaveBeenCalled();
@@ -755,13 +757,13 @@ describe('WorkoutsService', () => {
       it('should throw ConflictException when exerciseIds count mismatches', async () => {
         const plan = makePlan();
         const exercise = makeExercise();
-        const entries = [{ id: 'pe-1', planId: 'plan-1', exerciseId: 'exercise-1', orderIndex: 0, plan, exercise }] as TrainingPlanExercise[];
+        const entries = [{ id: PLAN_EXERCISE_ID, planId: PLAN_ID, exerciseId: EXERCISE_ID, orderIndex: 0, plan, exercise }] as TrainingPlanExercise[];
         trainingPlansRepository.findOne.mockResolvedValue({ ...plan, planExercises: [] });
         trainingPlanExercisesRepository.find.mockResolvedValue(entries);
 
         await expect(
-          service.reorderPlanExercises('plan-1', {
-            exerciseIds: ['exercise-1', 'exercise-2'],
+          service.reorderPlanExercises(PLAN_ID, {
+            exerciseIds: [EXERCISE_ID, EXERCISE_ID_2],
           }),
         ).rejects.toThrow(ConflictException);
       });
@@ -769,12 +771,12 @@ describe('WorkoutsService', () => {
       it('should throw ConflictException when exerciseId not in plan', async () => {
         const plan = makePlan();
         const exercise = makeExercise();
-        const entries = [{ id: 'pe-1', planId: 'plan-1', exerciseId: 'exercise-1', orderIndex: 0, plan, exercise }] as TrainingPlanExercise[];
+        const entries = [{ id: PLAN_EXERCISE_ID, planId: PLAN_ID, exerciseId: EXERCISE_ID, orderIndex: 0, plan, exercise }] as TrainingPlanExercise[];
         trainingPlansRepository.findOne.mockResolvedValue({ ...plan, planExercises: [] });
         trainingPlanExercisesRepository.find.mockResolvedValue(entries);
 
         await expect(
-          service.reorderPlanExercises('plan-1', { exerciseIds: ['non-existent'] }),
+          service.reorderPlanExercises(PLAN_ID, { exerciseIds: ['non-existent'] }),
         ).rejects.toThrow(ConflictException);
       });
     });
@@ -789,10 +791,10 @@ describe('WorkoutsService', () => {
         exercisesRepository.findOne.mockResolvedValue(exercise);
         workoutSetsRepository.find.mockResolvedValue([set]);
 
-        const result = await service.getExerciseHistory('exercise-1');
+        const result = await service.getExerciseHistory(EXERCISE_ID);
 
         expect(result).toHaveLength(1);
-        expect(result[0].exerciseId).toBe('exercise-1');
+        expect(result[0].exerciseId).toBe(EXERCISE_ID);
         expect(result[0].sets).toHaveLength(1);
       });
 
@@ -805,7 +807,7 @@ describe('WorkoutsService', () => {
         exercisesRepository.findOne.mockResolvedValue(exercise);
         workoutSetsRepository.find.mockResolvedValue([setActive, setCompleted]);
 
-        const result = await service.getExerciseHistory('exercise-1');
+        const result = await service.getExerciseHistory(EXERCISE_ID);
 
         expect(result).toHaveLength(1);
         expect(result[0].sessionId).toBe('session-2');
@@ -854,7 +856,7 @@ describe('WorkoutsService', () => {
         exercisesRepository.findOne.mockResolvedValue(exercise);
         workoutSetsRepository.find.mockResolvedValue([set]);
 
-        const result = await service.getExerciseProgress('exercise-1');
+        const result = await service.getExerciseProgress(EXERCISE_ID);
 
         expect(result).toHaveLength(1);
         expect(result[0].weight).toBe(100);
@@ -924,7 +926,7 @@ describe('WorkoutsService', () => {
         exercisesRepository.findOne.mockResolvedValue(exercise);
         workoutSetsRepository.find.mockResolvedValue([bodyweightSet, weightedSet]);
 
-        const result = await service.getExerciseProgress('exercise-1');
+        const result = await service.getExerciseProgress(EXERCISE_ID);
 
         expect(result).toHaveLength(1);
         expect(result[0].weight).toBe(80);
@@ -943,7 +945,7 @@ describe('WorkoutsService', () => {
         exercisesRepository.findOne.mockResolvedValue(exercise);
         workoutSetsRepository.find.mockResolvedValue([oldSet, recentSet]);
 
-        const result = await service.getExerciseProgress('exercise-1', 90);
+        const result = await service.getExerciseProgress(EXERCISE_ID, 90);
 
         expect(result).toHaveLength(1);
         expect(result[0].date).toEqual(recentSession.startedAt);

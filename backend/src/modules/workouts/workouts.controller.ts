@@ -9,6 +9,7 @@ import {
   Post,
   Put,
   Query,
+  Res,
 } from '@nestjs/common';
 import { Exercise } from '../../entities/exercise.entity';
 import { TrainingPlan } from '../../entities/training-plan.entity';
@@ -58,8 +59,11 @@ export class WorkoutsController {
   }
 
   @Get('sessions/active')
-  async getActiveSession(): Promise<WorkoutSession | null> {
-    return this.workoutsService.getActiveSession();
+  async getActiveSession(
+    @Res() res: { json: (body: WorkoutSession | null) => void },
+  ): Promise<void> {
+    const session = await this.workoutsService.getActiveSession();
+    res.json(session);
   }
 
   @Get('sessions')
@@ -165,6 +169,13 @@ export class WorkoutsController {
     return this.workoutsService.reorderPlanExercises(id, dto);
   }
 
+  @Get('history/recent-sessions')
+  async getRecentSessions(
+    @Query('limit', new ParseIntPipe({ optional: true })) limit?: number,
+  ): Promise<WorkoutSession[]> {
+    return this.workoutsService.getRecentSessions(limit);
+  }
+
   @Get('history/:exerciseId')
   async getExerciseHistory(@Param('exerciseId') exerciseId: string): Promise<
     Array<{
@@ -177,13 +188,6 @@ export class WorkoutsController {
     }>
   > {
     return this.workoutsService.getExerciseHistory(exerciseId);
-  }
-
-  @Get('history/recent-sessions')
-  async getRecentSessions(
-    @Query('limit', new ParseIntPipe({ optional: true })) limit?: number,
-  ): Promise<WorkoutSession[]> {
-    return this.workoutsService.getRecentSessions(limit);
   }
 
   @Get('graphs/:exerciseId')
