@@ -334,14 +334,15 @@ describe('WorkoutsService', () => {
         workoutSessionsRepository.findOne.mockResolvedValue(session);
         exercisesRepository.findOne.mockResolvedValue(exercise);
 
-        await expect(
-          service.addSet(SESSION_ID, {
-            exerciseId: EXERCISE_ID,
-            reps: 10,
-            weight: 100,
-            weightUnit: 'kg',
-          }),
-        ).rejects.toThrow(ConflictException);
+        const addSetPromise = service.addSet(SESSION_ID, {
+          exerciseId: EXERCISE_ID,
+          reps: 10,
+          weight: 100,
+          weightUnit: 'kg',
+        });
+
+        await expect(addSetPromise).rejects.toThrow(ConflictException);
+        await expect(addSetPromise).rejects.toThrow('Cannot add set to a non-active session');
       });
 
       it('should throw NotFoundException when exercise does not exist', async () => {
