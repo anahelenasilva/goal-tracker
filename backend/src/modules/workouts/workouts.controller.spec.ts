@@ -320,6 +320,17 @@ describe('WorkoutsController', () => {
         expect(service.addSet).toHaveBeenCalledWith('session-1', dto);
       });
 
+      it('should add a set with null weight', async () => {
+        const dto = { exerciseId: 'exercise-1', reps: 12, weight: null, weightUnit: 'kg' as const };
+        const set = makeSet({ reps: 12, weight: null });
+        service.addSet.mockResolvedValue(set);
+
+        const result = await controller.addSet('session-1', dto);
+
+        expect(result).toEqual(set);
+        expect(service.addSet).toHaveBeenCalledWith('session-1', dto);
+      });
+
       it('should throw ConflictException for non-active session', async () => {
         const dto = { exerciseId: 'exercise-1', reps: 10, weight: 100, weightUnit: 'kg' as const };
         service.addSet.mockRejectedValue(new ConflictException());
