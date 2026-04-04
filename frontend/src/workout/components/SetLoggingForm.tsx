@@ -35,9 +35,18 @@ export function SetLoggingForm({ onSubmit, lastSet, allowedExerciseIds }: SetLog
     }
 
     const repsNum = parseFloat(reps);
+    const weightValue = weight.trim();
+    const weightNum = weightValue === '' ? null : Number(weightValue);
 
     if (!reps || isNaN(repsNum) || repsNum <= 0) {
       setError('Please enter valid reps');
+      return;
+    }
+    if (
+      weightNum !== null &&
+      (!Number.isFinite(weightNum) || weightNum < 0)
+    ) {
+      setError('Please enter valid weight');
       return;
     }
 
@@ -46,7 +55,7 @@ export function SetLoggingForm({ onSubmit, lastSet, allowedExerciseIds }: SetLog
       await onSubmit({
         exerciseId: selectedExercise.id,
         reps: repsNum,
-        weight: weight.trim() === '' ? null : parseFloat(weight),
+        weight: weightNum,
         weightUnit: unit,
         notes: notes.trim() || undefined,
       });

@@ -150,18 +150,33 @@ function QuickAddForm({ exercise, lastSet, onSubmit, onCancel }: QuickAddFormPro
   );
   const [unit, setUnit] = useState<WeightUnit>(lastSet?.weightUnit || 'kg');
   const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError(null);
     const repsNum = parseFloat(reps);
-    if (!reps || isNaN(repsNum) || repsNum <= 0) return;
+    const weightValue = weight.trim();
+    const weightNum = weightValue === '' ? null : Number(weightValue);
+
+    if (!reps || isNaN(repsNum) || repsNum <= 0) {
+      setError('Please enter valid reps');
+      return;
+    }
+    if (
+      weightNum !== null &&
+      (!Number.isFinite(weightNum) || weightNum < 0)
+    ) {
+      setError('Please enter valid weight');
+      return;
+    }
 
     setSubmitting(true);
     try {
       await onSubmit({
         exerciseId: exercise.id,
         reps: repsNum,
-        weight: weight.trim() === '' ? null : parseFloat(weight),
+        weight: weightNum,
         weightUnit: unit,
       });
     } finally {
@@ -222,6 +237,11 @@ function QuickAddForm({ exercise, lastSet, onSubmit, onCancel }: QuickAddFormPro
           Cancel
         </button>
       </div>
+      {error && (
+        <div className="mt-2 text-xs text-red-300" role="alert">
+          {error}
+        </div>
+      )}
     </form>
   );
 }
