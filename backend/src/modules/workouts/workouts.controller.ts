@@ -11,7 +11,6 @@ import {
   Query,
   Res,
 } from '@nestjs/common';
-import { Response } from 'express';
 import { Exercise } from '../../entities/exercise.entity';
 import { TrainingPlan } from '../../entities/training-plan.entity';
 import { WorkoutSession } from '../../entities/workout-session.entity';
@@ -60,7 +59,9 @@ export class WorkoutsController {
   }
 
   @Get('sessions/active')
-  async getActiveSession(@Res() res: Response): Promise<void> {
+  async getActiveSession(
+    @Res() res: { json: (body: WorkoutSession | null) => void },
+  ): Promise<void> {
     const session = await this.workoutsService.getActiveSession();
     res.json(session);
   }

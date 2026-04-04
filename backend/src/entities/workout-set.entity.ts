@@ -35,7 +35,13 @@ export class WorkoutSet {
     nullable: true,
     transformer: {
       to: (value: number | null) => value,
-      from: (value: string | null) => (value === null ? null : parseFloat(value)),
+      from: (value: string | null) => {
+        if (value === null) {
+          return null;
+        }
+        const parsedValue = Number(value);
+        return Number.isFinite(parsedValue) ? parsedValue : null;
+      },
     },
   })
   weight: number | null;

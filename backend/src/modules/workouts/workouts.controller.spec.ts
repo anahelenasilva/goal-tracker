@@ -192,18 +192,20 @@ describe('WorkoutsController', () => {
       it('should return active session', async () => {
         const session = makeSession();
         service.getActiveSession.mockResolvedValue(session);
+        const response = { json: jest.fn() };
 
-        const result = await controller.getActiveSession();
+        await controller.getActiveSession(response);
 
-        expect(result).toEqual(session);
+        expect(response.json).toHaveBeenCalledWith(session);
       });
 
       it('should return null when no active session', async () => {
         service.getActiveSession.mockResolvedValue(null);
+        const response = { json: jest.fn() };
 
-        const result = await controller.getActiveSession();
+        await controller.getActiveSession(response);
 
-        expect(result).toBeNull();
+        expect(response.json).toHaveBeenCalledWith(null);
       });
     });
 
