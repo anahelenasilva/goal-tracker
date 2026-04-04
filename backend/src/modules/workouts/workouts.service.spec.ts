@@ -13,6 +13,7 @@ import { WorkoutsService } from './workouts.service';
 const makeExercise = (overrides: Partial<Exercise> = {}): Exercise => ({
   id: 'exercise-1',
   name: 'Bench Press',
+  namePt: 'Supino',
   category: 'chest',
   isCustom: false,
   createdAt: new Date(),
@@ -42,6 +43,7 @@ const makeSet = (overrides: Partial<WorkoutSet> = {}): WorkoutSet => ({
   sessionId: 'session-1',
   exerciseId: 'exercise-1',
   reps: 10,
+  sets: 1,
   weight: 100,
   weightUnit: 'kg',
   notes: null,
@@ -485,7 +487,7 @@ describe('WorkoutsService', () => {
 
     describe('createExercise', () => {
       it('should create and return a new exercise', async () => {
-        const dto = { name: 'New Exercise', category: 'chest' as const, isCustom: true };
+        const dto = { name: 'New Exercise', namePt: 'Nova Exercício', category: 'chest' as const, isCustom: true };
         const exercise = makeExercise(dto);
         exercisesRepository.create.mockReturnValue(exercise);
         exercisesRepository.save.mockResolvedValue(exercise);
@@ -858,6 +860,46 @@ describe('WorkoutsService', () => {
         expect(result[0].weight).toBe(100);
         expect(result[0].reps).toBe(10);
         expect(result[0].volume).toBe(1000);
+      });
+
+      it('should apply sets multiplier to volume calculation', async () => {
+        const exercise = makeExercise();
+        const session = makeSession({ status: 'completed', startedAt: new Date() });
+        const workoutSet = makeSet({
+          session,
+          exercise,
+          weight: 100,
+          reps: 10,
+          sets: 3,
+        });
+        exercisesRepository.findOne.mockResolvedValue(exercise);
+        workoutSetsRepository.find.mockResolvedValue([workoutSet]);
+
+        const result = await service.getExerciseProgress(exercise.id);
+
+        expect(workoutSetsRepository.find).toHaveBeenCalledWith(
+          expect.objectContaining({ where: { exerciseId: exercise.id } }),
+        );
+        expect(result).toHaveLength(1);
+        expect(result[0].volume).toBe(100 * 10 * 3);
+      });
+
+      it('should produce different volumes for different sets counts', async () => {
+        const exercise = makeExercise();
+        const twoDaysAgo = new Date(Date.now() - 2 * 24 * 60 * 60 * 1000);
+        const oneDayAgo = new Date(Date.now() - 1 * 24 * 60 * 60 * 1000);
+        const sessionA = makeSession({ id: 'session-a', status: 'completed', startedAt: twoDaysAgo });
+        const sessionB = makeSession({ id: 'session-b', status: 'completed', startedAt: oneDayAgo });
+        const singleSet = makeSet({ id: 'set-a', session: sessionA, exercise, sessionId: 'session-a', weight: 100, reps: 10, sets: 1 });
+        const tripleSet = makeSet({ id: 'set-b', session: sessionB, exercise, sessionId: 'session-b', weight: 100, reps: 10, sets: 3 });
+        exercisesRepository.findOne.mockResolvedValue(exercise);
+        workoutSetsRepository.find.mockResolvedValue([singleSet, tripleSet]);
+
+        const result = await service.getExerciseProgress(exercise.id);
+
+        expect(result).toHaveLength(2);
+        expect(result[0].volume).toBe(100 * 10 * 1);
+        expect(result[1].volume).toBe(100 * 10 * 3);
       });
 
       it('should treat null weight as zero in progress calculations', async () => {

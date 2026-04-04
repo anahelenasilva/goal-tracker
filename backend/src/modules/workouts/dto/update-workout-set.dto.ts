@@ -14,6 +14,11 @@ export class UpdateWorkoutSetDto {
   reps?: number;
 
   @IsOptional()
+  @IsInt()
+  @Min(1)
+  sets?: number;
+
+  @IsOptional()
   @Min(0)
   weight?: number;
 

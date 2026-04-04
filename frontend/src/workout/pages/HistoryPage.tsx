@@ -80,6 +80,7 @@ function SessionDetail({
   onAddSet: (data: {
     exerciseId: string;
     reps: number;
+    sets: number;
     weight: number | null;
     weightUnit: 'kg' | 'lb';
     notes?: string;
@@ -106,6 +107,7 @@ function SessionDetail({
   const handleAddSet = async (data: {
     exerciseId: string;
     reps: number;
+    sets: number;
     weight: number | null;
     weightUnit: 'kg' | 'lb';
     notes?: string;
@@ -116,6 +118,7 @@ function SessionDetail({
       exerciseId: data.exerciseId,
       sessionId: session.id,
       reps: data.reps,
+      sets: data.sets,
       weight: data.weight,
       weightUnit: data.weightUnit,
       notes: data.notes || '',
@@ -197,6 +200,7 @@ function SessionDetail({
                 <div className="flex items-center gap-3">
                   <span className="text-gray-500 font-medium w-6">#{index + 1}</span>
                   <span className="text-white">
+                    {set.sets > 1 ? `${set.sets} × ` : ''}
                     {set.reps} reps{set.weight != null ? ` @ ${set.weight}${set.weightUnit}` : ''}
                   </span>
                 </div>
@@ -232,7 +236,10 @@ function ExerciseHistoryCard({
   onClick: () => void;
 }) {
   const maxWeight = Math.max(...entry.sets.map(s => s.weight ?? 0));
-  const totalVolume = entry.sets.reduce((sum, s) => sum + (s.weight ?? 0) * s.reps, 0);
+  const totalVolume = entry.sets.reduce(
+    (sum, s) => sum + (s.weight ?? 0) * s.reps * s.sets,
+    0,
+  );
 
   return (
     <button
@@ -287,6 +294,7 @@ function ExerciseHistoryDetail({
               <div className="flex items-center gap-3">
                 <span className="text-gray-500 font-medium w-6">#{index + 1}</span>
                 <span className="text-white">
+                  {set.sets > 1 ? `${set.sets} × ` : ''}
                   {set.reps} reps{set.weight != null ? ` @ ${set.weight}${set.weightUnit}` : ''}
                 </span>
               </div>
@@ -322,6 +330,7 @@ export function HistoryPage() {
   async function handleAddSet(sessionId: string, data: {
     exerciseId: string;
     reps: number;
+    sets: number;
     weight: number | null;
     weightUnit: 'kg' | 'lb';
     notes?: string;

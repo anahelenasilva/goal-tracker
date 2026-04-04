@@ -71,6 +71,7 @@ function mapWorkoutSet(data: Record<string, unknown>): WorkoutSet {
     exerciseId: data.exerciseId as string,
     exercise: data.exercise ? mapExercise(data.exercise as Record<string, unknown>) : undefined,
     reps: data.reps as number,
+    sets: typeof data.sets === 'number' ? data.sets : 1,
     weight: data.weight == null ? null : Number(data.weight),
     weightUnit: data.weightUnit as WorkoutSet['weightUnit'],
     notes: data.notes as string | undefined,

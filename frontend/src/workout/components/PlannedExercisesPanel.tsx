@@ -9,6 +9,7 @@ interface PlannedExercisesPanelProps {
   onQuickAdd: (data: {
     exerciseId: string;
     reps: number;
+    sets: number;
     weight: number | null;
     weightUnit: WeightUnit;
     notes?: string;
@@ -98,7 +99,7 @@ export function PlannedExercisesPanel({ plan, sessionSets, onQuickAdd }: Planned
                   )}
                   {started && (
                     <span className="text-green-400 text-xs ml-2">
-                      {sets.length} {sets.length === 1 ? 'set' : 'sets'}
+                      {sets.reduce((sum, s) => sum + s.sets, 0)} sets
                     </span>
                   )}
                 </div>
@@ -136,6 +137,7 @@ interface QuickAddFormProps {
   onSubmit: (data: {
     exerciseId: string;
     reps: number;
+    sets: number;
     weight: number | null;
     weightUnit: WeightUnit;
     notes?: string;
@@ -145,6 +147,7 @@ interface QuickAddFormProps {
 
 function QuickAddForm({ exercise, lastSet, onSubmit, onCancel }: QuickAddFormProps) {
   const [reps, setReps] = useState(lastSet?.reps.toString() || '');
+  const [sets, setSets] = useState((lastSet?.sets ?? 1).toString());
   const [weight, setWeight] = useState(
     lastSet?.weight != null ? lastSet.weight.toString() : '',
   );
@@ -156,11 +159,22 @@ function QuickAddForm({ exercise, lastSet, onSubmit, onCancel }: QuickAddFormPro
     e.preventDefault();
     setError(null);
     const repsNum = parseFloat(reps);
+    const setsTrimmed = sets.trim();
+    const setsNum = Number(setsTrimmed);
     const weightValue = weight.trim();
     const weightNum = weightValue === '' ? null : Number(weightValue);
 
     if (!reps || isNaN(repsNum) || repsNum <= 0) {
       setError('Please enter valid reps');
+      return;
+    }
+    if (
+      !setsTrimmed ||
+      !Number.isFinite(setsNum) ||
+      !Number.isInteger(setsNum) ||
+      setsNum < 1
+    ) {
+      setError('Please enter a valid set count');
       return;
     }
     if (
@@ -176,6 +190,7 @@ function QuickAddForm({ exercise, lastSet, onSubmit, onCancel }: QuickAddFormPro
       await onSubmit({
         exerciseId: exercise.id,
         reps: repsNum,
+        sets: setsNum,
         weight: weightNum,
         weightUnit: unit,
       });
@@ -186,8 +201,8 @@ function QuickAddForm({ exercise, lastSet, onSubmit, onCancel }: QuickAddFormPro
 
   return (
     <form onSubmit={handleSubmit} className="mt-1 p-3 bg-gray-800/50 rounded-lg border border-gray-700">
-      <div className="flex gap-2 items-end">
-        <div className="flex-1">
+      <div className="flex flex-wrap gap-2 items-end">
+        <div className="flex-1 min-w-[4rem]">
           <label className="block text-xs text-gray-400 mb-1">Reps</label>
           <input
             type="number"
@@ -199,7 +214,19 @@ function QuickAddForm({ exercise, lastSet, onSubmit, onCancel }: QuickAddFormPro
             autoFocus
           />
         </div>
-        <div className="flex-1">
+        <div className="w-14 shrink-0">
+          <label className="block text-xs text-gray-400 mb-1">Sets</label>
+          <input
+            type="number"
+            inputMode="numeric"
+            min={1}
+            value={sets}
+            onChange={(e) => setSets(e.target.value)}
+            placeholder="1"
+            className="w-full px-2 py-1.5 bg-gray-800 border border-gray-700 rounded text-white text-sm placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+          />
+        </div>
+        <div className="flex-1 min-w-[4rem]">
           <label className="block text-xs text-gray-400 mb-1">Weight</label>
           <input
             type="number"
