@@ -25,8 +25,8 @@ export class WorkoutSet {
   @Column({ type: 'int' })
   reps: number;
 
-  @Column({ type: 'decimal', precision: 10, scale: 2 })
-  weight: number;
+  @Column({ type: 'decimal', precision: 10, scale: 2, nullable: true })
+  weight: number | null;
 
   @Column({ name: 'weight_unit', type: 'varchar' })
   weightUnit: WeightUnit;

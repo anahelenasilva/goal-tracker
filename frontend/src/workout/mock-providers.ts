@@ -368,9 +368,9 @@ class MockGraphProvider implements GraphProvider {
       const exerciseSets = sets.filter(s => s.exerciseId === exerciseId);
 
       if (exerciseSets.length > 0) {
-        const maxWeight = Math.max(...exerciseSets.map(s => s.weight));
+        const maxWeight = Math.max(...exerciseSets.map(s => s.weight ?? 0));
         const maxReps = Math.max(...exerciseSets.map(s => s.reps));
-        const totalVolume = exerciseSets.reduce((sum, s) => sum + (s.weight * s.reps), 0);
+        const totalVolume = exerciseSets.reduce((sum, s) => sum + (s.weight ?? 0) * s.reps, 0);
 
         points.push({
           date: session.startedAt,

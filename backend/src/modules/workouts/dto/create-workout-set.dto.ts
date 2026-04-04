@@ -11,8 +11,9 @@ export class CreateWorkoutSetDto {
   @Min(1)
   reps: number;
 
+  @IsOptional()
   @Min(0)
-  weight: number;
+  weight?: number | null;
 
   @IsIn(WEIGHT_UNITS)
   weightUnit: WeightUnit;

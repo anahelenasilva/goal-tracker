@@ -80,7 +80,7 @@ function SessionDetail({
   onAddSet: (data: {
     exerciseId: string;
     reps: number;
-    weight: number;
+    weight: number | null;
     weightUnit: 'kg' | 'lb';
     notes?: string;
   }) => Promise<void>;
@@ -106,7 +106,7 @@ function SessionDetail({
   const handleAddSet = async (data: {
     exerciseId: string;
     reps: number;
-    weight: number;
+    weight: number | null;
     weightUnit: 'kg' | 'lb';
     notes?: string;
   }) => {
@@ -197,7 +197,7 @@ function SessionDetail({
                 <div className="flex items-center gap-3">
                   <span className="text-gray-500 font-medium w-6">#{index + 1}</span>
                   <span className="text-white">
-                    {set.reps} reps @ {set.weight}{set.weightUnit}
+                    {set.reps} reps{set.weight != null ? ` @ ${set.weight}${set.weightUnit}` : ''}
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
@@ -231,8 +231,8 @@ function ExerciseHistoryCard({
   entry: ExerciseHistoryEntry;
   onClick: () => void;
 }) {
-  const maxWeight = Math.max(...entry.sets.map(s => s.weight));
-  const totalVolume = entry.sets.reduce((sum, s) => sum + (s.weight * s.reps), 0);
+  const maxWeight = Math.max(...entry.sets.map(s => s.weight ?? 0));
+  const totalVolume = entry.sets.reduce((sum, s) => sum + (s.weight ?? 0) * s.reps, 0);
 
   return (
     <button
@@ -287,7 +287,7 @@ function ExerciseHistoryDetail({
               <div className="flex items-center gap-3">
                 <span className="text-gray-500 font-medium w-6">#{index + 1}</span>
                 <span className="text-white">
-                  {set.reps} reps @ {set.weight}{set.weightUnit}
+                  {set.reps} reps{set.weight != null ? ` @ ${set.weight}${set.weightUnit}` : ''}
                 </span>
               </div>
               {set.notes && (
@@ -322,7 +322,7 @@ export function HistoryPage() {
   async function handleAddSet(sessionId: string, data: {
     exerciseId: string;
     reps: number;
-    weight: number;
+    weight: number | null;
     weightUnit: 'kg' | 'lb';
     notes?: string;
   }) {

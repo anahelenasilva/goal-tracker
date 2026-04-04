@@ -30,7 +30,7 @@ export interface WorkoutSet {
   exerciseId: string;
   exercise?: Exercise;
   reps: number;
-  weight: number;
+  weight: number | null;
   weightUnit: WeightUnit;
   notes?: string;
   createdAt: string;
@@ -70,7 +70,7 @@ export interface ExerciseHistoryEntry {
 
 export interface ExerciseProgressPoint {
   date: string;
-  weight: number;
+  weight: number | null;
   reps: number;
   volume: number;
 }

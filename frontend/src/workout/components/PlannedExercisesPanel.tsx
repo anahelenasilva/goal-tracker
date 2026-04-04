@@ -9,7 +9,7 @@ interface PlannedExercisesPanelProps {
   onQuickAdd: (data: {
     exerciseId: string;
     reps: number;
-    weight: number;
+    weight: number | null;
     weightUnit: WeightUnit;
     notes?: string;
   }) => Promise<void>;
@@ -136,7 +136,7 @@ interface QuickAddFormProps {
   onSubmit: (data: {
     exerciseId: string;
     reps: number;
-    weight: number;
+    weight: number | null;
     weightUnit: WeightUnit;
     notes?: string;
   }) => Promise<void>;
@@ -145,23 +145,23 @@ interface QuickAddFormProps {
 
 function QuickAddForm({ exercise, lastSet, onSubmit, onCancel }: QuickAddFormProps) {
   const [reps, setReps] = useState(lastSet?.reps.toString() || '');
-  const [weight, setWeight] = useState(lastSet?.weight.toString() || '');
+  const [weight, setWeight] = useState(
+    lastSet?.weight != null ? lastSet.weight.toString() : '',
+  );
   const [unit, setUnit] = useState<WeightUnit>(lastSet?.weightUnit || 'kg');
   const [submitting, setSubmitting] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const repsNum = parseFloat(reps);
-    const weightNum = parseFloat(weight);
     if (!reps || isNaN(repsNum) || repsNum <= 0) return;
-    if (!weight || isNaN(weightNum) || weightNum <= 0) return;
 
     setSubmitting(true);
     try {
       await onSubmit({
         exerciseId: exercise.id,
         reps: repsNum,
-        weight: weightNum,
+        weight: weight.trim() === '' ? null : parseFloat(weight),
         weightUnit: unit,
       });
     } finally {

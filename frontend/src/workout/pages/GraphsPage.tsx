@@ -39,7 +39,12 @@ function LineChart({
     );
   }
 
-  const values = data.map(d => d[metric]);
+  const valueAt = (d: ExerciseProgressPoint): number => {
+    if (metric === 'weight') return d.weight ?? 0;
+    return d[metric];
+  };
+
+  const values = data.map(valueAt);
   const minVal = Math.min(...values);
   const maxVal = Math.max(...values);
   const range = maxVal - minVal || 1;
@@ -51,9 +56,9 @@ function LineChart({
 
   const points = data.map((d, i) => ({
     x: padding.left + (i / Math.max(data.length - 1, 1)) * chartWidth,
-    y: padding.top + chartHeight - ((d[metric] - minVal) / range) * chartHeight,
+    y: padding.top + chartHeight - ((valueAt(d) - minVal) / range) * chartHeight,
     date: d.date,
-    value: d[metric],
+    value: valueAt(d),
   }));
 
   const pathD = points.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`).join(' ');
@@ -209,10 +214,11 @@ export function GraphsPage() {
   const stats = progressData.length > 0
     ? {
         sessions: progressData.length,
-        maxWeight: Math.max(...progressData.map(d => d.weight)),
+        maxWeight: Math.max(...progressData.map(d => d.weight ?? 0)),
         maxReps: Math.max(...progressData.map(d => d.reps)),
         totalVolume: progressData.reduce((sum, d) => sum + d.volume, 0),
-        avgWeight: progressData.reduce((sum, d) => sum + d.weight, 0) / progressData.length,
+        avgWeight:
+          progressData.reduce((sum, d) => sum + (d.weight ?? 0), 0) / progressData.length,
       }
     : null;
 
@@ -344,7 +350,13 @@ export function GraphsPage() {
                     </div>
                     <div className="flex gap-4 text-sm">
                       <span className="text-gray-400">
-                        <span className="text-white">{point.weight}</span> kg
+                        {point.weight != null ? (
+                          <>
+                            <span className="text-white">{point.weight}</span> kg
+                          </>
+                        ) : (
+                          <span className="text-gray-500">—</span>
+                        )}
                       </span>
                       <span className="text-gray-400">
                         <span className="text-white">{point.reps}</span> reps

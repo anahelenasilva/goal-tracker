@@ -6,7 +6,7 @@ interface SetLoggingFormProps {
   onSubmit: (data: {
     exerciseId: string;
     reps: number;
-    weight: number;
+    weight: number | null;
     weightUnit: WeightUnit;
     notes?: string;
   }) => Promise<void>;
@@ -17,7 +17,9 @@ interface SetLoggingFormProps {
 export function SetLoggingForm({ onSubmit, lastSet, allowedExerciseIds }: SetLoggingFormProps) {
   const [selectedExercise, setSelectedExercise] = useState<Exercise | null>(null);
   const [reps, setReps] = useState<string>(lastSet?.reps.toString() || '');
-  const [weight, setWeight] = useState<string>(lastSet?.weight.toString() || '');
+  const [weight, setWeight] = useState<string>(
+    lastSet?.weight != null ? lastSet.weight.toString() : '',
+  );
   const [unit, setUnit] = useState<WeightUnit>(lastSet?.weightUnit || 'kg');
   const [notes, setNotes] = useState<string>(lastSet?.notes || '');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -33,15 +35,9 @@ export function SetLoggingForm({ onSubmit, lastSet, allowedExerciseIds }: SetLog
     }
 
     const repsNum = parseFloat(reps);
-    const weightNum = parseFloat(weight);
 
     if (!reps || isNaN(repsNum) || repsNum <= 0) {
       setError('Please enter valid reps');
-      return;
-    }
-
-    if (!weight || isNaN(weightNum) || weightNum <= 0) {
-      setError('Please enter valid weight');
       return;
     }
 
@@ -50,7 +46,7 @@ export function SetLoggingForm({ onSubmit, lastSet, allowedExerciseIds }: SetLog
       await onSubmit({
         exerciseId: selectedExercise.id,
         reps: repsNum,
-        weight: weightNum,
+        weight: weight.trim() === '' ? null : parseFloat(weight),
         weightUnit: unit,
         notes: notes.trim() || undefined,
       });
@@ -68,7 +64,7 @@ export function SetLoggingForm({ onSubmit, lastSet, allowedExerciseIds }: SetLog
   const handleQuickFill = () => {
     if (lastSet) {
       setReps(lastSet.reps.toString());
-      setWeight(lastSet.weight.toString());
+      setWeight(lastSet.weight != null ? lastSet.weight.toString() : '');
       setUnit(lastSet.weightUnit);
     }
   };
