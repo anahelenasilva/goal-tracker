@@ -28,7 +28,16 @@ export class WorkoutSet {
   @Column({ type: 'int', default: 1 })
   sets: number;
 
-  @Column({ type: 'decimal', precision: 10, scale: 2, nullable: true })
+  @Column({
+    type: 'decimal',
+    precision: 10,
+    scale: 2,
+    nullable: true,
+    transformer: {
+      to: (value: number | null) => value,
+      from: (value: string | null) => (value === null ? null : parseFloat(value)),
+    },
+  })
   weight: number | null;
 
   @Column({ name: 'weight_unit', type: 'varchar' })

@@ -7,6 +7,7 @@ import {
   Logger,
 } from '@nestjs/common';
 import { Request, Response } from 'express';
+import { QueryFailedError } from 'typeorm';
 
 @Catch()
 export class AllExceptionsFilter implements ExceptionFilter {
@@ -31,6 +32,16 @@ export class AllExceptionsFilter implements ExceptionFilter {
         const responseObj = exceptionResponse as any;
         message = responseObj.message || message;
         error = responseObj.error || error;
+      }
+    } else if (exception instanceof QueryFailedError) {
+      const pgError = (exception as any).driverError;
+      if (pgError?.code === '22P02') {
+        status = HttpStatus.NOT_FOUND;
+        message = 'Resource not found';
+        error = 'Not Found';
+      } else {
+        message = exception.message;
+        this.logger.error(`Unhandled QueryFailedError: ${exception.message}`, exception.stack);
       }
     } else if (exception instanceof Error) {
       message = exception.message;
