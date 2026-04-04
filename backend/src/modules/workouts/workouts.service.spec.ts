@@ -861,6 +861,25 @@ describe('WorkoutsService', () => {
         expect(result[0].volume).toBe(1000);
       });
 
+      it('should multiply volume by sets count for each logged entry', async () => {
+        const exercise = makeExercise();
+        const session = makeSession({ status: 'completed', startedAt: new Date() });
+        const set = makeSet({
+          session,
+          exercise,
+          weight: 100,
+          reps: 10,
+          sets: 3,
+        });
+        exercisesRepository.findOne.mockResolvedValue(exercise);
+        workoutSetsRepository.find.mockResolvedValue([set]);
+
+        const result = await service.getExerciseProgress('exercise-1');
+
+        expect(result).toHaveLength(1);
+        expect(result[0].volume).toBe(3000);
+      });
+
       it('should treat null weight as zero in progress calculations', async () => {
         const exercise = makeExercise();
         const session = makeSession({ status: 'completed', startedAt: new Date() });
