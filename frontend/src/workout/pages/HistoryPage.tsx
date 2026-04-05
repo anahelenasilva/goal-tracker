@@ -82,7 +82,6 @@ function SessionDetail({
     reps: number;
     sets: number;
     weight: number | null;
-    weightUnit: 'kg' | 'lb';
     notes?: string;
   }) => Promise<void>;
   onDeleteSet: (setId: string) => Promise<void>;
@@ -109,7 +108,6 @@ function SessionDetail({
     reps: number;
     sets: number;
     weight: number | null;
-    weightUnit: 'kg' | 'lb';
     notes?: string;
   }) => {
     await onAddSet(data);
@@ -120,7 +118,6 @@ function SessionDetail({
       reps: data.reps,
       sets: data.sets,
       weight: data.weight,
-      weightUnit: data.weightUnit,
       notes: data.notes || '',
       createdAt: new Date().toISOString(),
     } as WorkoutSet);
@@ -201,7 +198,7 @@ function SessionDetail({
                   <span className="text-gray-500 font-medium w-6">#{index + 1}</span>
                   <span className="text-white">
                     {set.sets > 1 ? `${set.sets} × ` : ''}
-                    {set.reps} reps{set.weight != null ? ` @ ${set.weight}${set.weightUnit}` : ''}
+                    {set.reps} reps{set.weight != null ? ` @ ${set.weight}kg` : ''}
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
@@ -295,7 +292,7 @@ function ExerciseHistoryDetail({
                 <span className="text-gray-500 font-medium w-6">#{index + 1}</span>
                 <span className="text-white">
                   {set.sets > 1 ? `${set.sets} × ` : ''}
-                  {set.reps} reps{set.weight != null ? ` @ ${set.weight}${set.weightUnit}` : ''}
+                  {set.reps} reps{set.weight != null ? ` @ ${set.weight}kg` : ''}
                 </span>
               </div>
               {set.notes && (
@@ -332,7 +329,6 @@ export function HistoryPage() {
     reps: number;
     sets: number;
     weight: number | null;
-    weightUnit: 'kg' | 'lb';
     notes?: string;
   }) {
     await sets.add(sessionId, data);

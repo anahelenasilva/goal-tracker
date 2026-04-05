@@ -10,8 +10,6 @@ export type ExerciseCategory =
   | 'full_body'
   | 'other';
 
-export type WeightUnit = 'kg' | 'lb';
-
 export type WorkoutSessionStatus = 'active' | 'completed' | 'abandoned';
 
 export interface Exercise {
@@ -32,7 +30,6 @@ export interface WorkoutSet {
   reps: number;
   sets: number;
   weight: number | null;
-  weightUnit: WeightUnit;
   notes?: string;
   createdAt: string;
 }
