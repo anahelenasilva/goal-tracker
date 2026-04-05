@@ -48,6 +48,7 @@ export class SeedService implements OnModuleInit {
       const treadmillGoal = this.goalRepository.create({
         userId: adminUser.id,
         title: 'treadmill',
+        type: 'treadmill',
       });
 
       await this.goalRepository.save([exerciseGoal, treadmillGoal]);

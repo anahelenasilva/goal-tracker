@@ -10,6 +10,8 @@ import {
 import { GoalEntry } from './goal-entry.entity';
 import { User } from './user.entity';
 
+export type GoalType = 'boolean' | 'treadmill';
+
 @Entity('goals')
 export class Goal {
   @PrimaryGeneratedColumn('uuid')
@@ -20,6 +22,9 @@ export class Goal {
 
   @Column()
   title: string;
+
+  @Column({ type: 'varchar', length: 20, default: 'boolean' })
+  type: GoalType;
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;

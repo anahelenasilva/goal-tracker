@@ -51,6 +51,7 @@ describe('GoalsController', () => {
         id: '1',
         userId: 'user1',
         title: 'exercise',
+        type: 'boolean',
         createdAt: new Date(),
         user: {
           id: 'user1',
@@ -77,12 +78,14 @@ describe('GoalsController', () => {
         {
           id: 'entry1',
           goalId: '1',
+          value: null,
           createdAt: new Date(),
         } as GoalEntry,
       ];
 
       service.getGoalEntries.mockResolvedValue(entries);
       service.hasEntryForToday.mockResolvedValue(true);
+      service.hasEntryForYesterday.mockResolvedValue(false);
 
       const result = await controller.getEntries('1');
 
@@ -90,9 +93,36 @@ describe('GoalsController', () => {
         entries,
         count: 1,
         hasEntryToday: true,
+        hasEntryYesterday: false,
       });
       expect(service.getGoalEntries).toHaveBeenCalledWith('1');
       expect(service.hasEntryForToday).toHaveBeenCalledWith('1');
+      expect(service.hasEntryForYesterday).toHaveBeenCalledWith('1');
+    });
+  });
+
+  describe('createGoal', () => {
+    it('should create and return a goal', async () => {
+      const newGoal = makeGoal({
+        id: 'goal1',
+        userId: 'user1',
+        title: 'treadmill',
+        type: 'treadmill',
+      });
+      service.createGoal.mockResolvedValue(newGoal);
+
+      const result = await controller.createGoal({
+        userId: 'user1',
+        title: 'treadmill',
+        type: 'treadmill',
+      });
+
+      expect(result).toEqual(newGoal);
+      expect(service.createGoal).toHaveBeenCalledWith(
+        'user1',
+        'treadmill',
+        'treadmill',
+      );
     });
   });
 
@@ -101,15 +131,16 @@ describe('GoalsController', () => {
       const newEntry: GoalEntry = {
         id: 'entry1',
         goalId: '1',
+        value: 30,
         createdAt: new Date(),
       } as GoalEntry;
 
       service.createEntry.mockResolvedValue(newEntry);
 
-      const result = await controller.createEntry('1', {});
+      const result = await controller.createEntry('1', { value: 30 });
 
       expect(result).toEqual(newEntry);
-      expect(service.createEntry).toHaveBeenCalledWith('1', undefined);
+      expect(service.createEntry).toHaveBeenCalledWith('1', undefined, 30);
     });
   });
 });

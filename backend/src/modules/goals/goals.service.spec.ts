@@ -1,4 +1,8 @@
-import { ConflictException, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  NotFoundException,
+} from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { mock, MockProxy } from 'jest-mock-extended';
@@ -44,6 +48,7 @@ describe('GoalsService', () => {
           id: '1',
           userId: 'user1',
           title: 'exercise',
+          type: 'boolean',
           createdAt: new Date(),
           user: {
             id: 'user1',
@@ -73,6 +78,7 @@ describe('GoalsService', () => {
         id: '1',
         userId: 'user1',
         title: 'exercise',
+        type: 'boolean',
         createdAt: new Date(),
         user: {
           id: 'user1',
@@ -108,6 +114,7 @@ describe('GoalsService', () => {
         id: '1',
         userId: 'user1',
         title: 'exercise',
+        type: 'boolean',
         createdAt: new Date(),
         user: {
           id: 'user1',
@@ -123,6 +130,7 @@ describe('GoalsService', () => {
         {
           id: 'entry1',
           goalId: '1',
+          value: null,
           createdAt: new Date(),
         } as GoalEntry,
       ];
@@ -146,6 +154,7 @@ describe('GoalsService', () => {
         id: '1',
         userId: 'user1',
         title: 'exercise',
+        type: 'boolean',
         createdAt: new Date(),
         user: {
           id: 'user1',
@@ -175,6 +184,7 @@ describe('GoalsService', () => {
         id: '1',
         userId: 'user1',
         title: 'exercise',
+        type: 'boolean',
         createdAt: new Date(),
         user: {
           id: 'user1',
@@ -189,6 +199,7 @@ describe('GoalsService', () => {
       const newEntry: GoalEntry = {
         id: 'entry1',
         goalId: '1',
+        value: null,
         createdAt: new Date(),
       } as GoalEntry;
 
@@ -209,11 +220,77 @@ describe('GoalsService', () => {
       expect(goalEntriesRepository.save).toHaveBeenCalledWith(newEntry);
     });
 
+    it('should create a treadmill entry with value', async () => {
+      const goal: Goal = {
+        id: '1',
+        userId: 'user1',
+        title: 'treadmill',
+        type: 'treadmill',
+        createdAt: new Date(),
+        user: {
+          id: 'user1',
+          name: 'John Doe',
+          email: 'john.doe@example.com',
+          createdAt: new Date(),
+          goals: [],
+        },
+        entries: [],
+      };
+
+      const newEntry: GoalEntry = {
+        id: 'entry1',
+        goalId: '1',
+        value: 30,
+        createdAt: new Date(),
+      } as GoalEntry;
+
+      goalsRepository.findOne.mockResolvedValue(goal);
+      goalEntriesRepository.count.mockResolvedValue(0);
+      goalEntriesRepository.create.mockReturnValue(newEntry);
+      goalEntriesRepository.save.mockResolvedValue(newEntry);
+
+      const result = await service.createEntry('1', undefined, 30);
+
+      expect(result).toEqual(newEntry);
+      expect(goalEntriesRepository.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          goalId: '1',
+          value: 30,
+        }),
+      );
+    });
+
+    it('should reject treadmill entry without positive value', async () => {
+      const goal: Goal = {
+        id: '1',
+        userId: 'user1',
+        title: 'treadmill',
+        type: 'treadmill',
+        createdAt: new Date(),
+        user: {
+          id: 'user1',
+          name: 'John Doe',
+          email: 'john.doe@example.com',
+          createdAt: new Date(),
+          goals: [],
+        },
+        entries: [],
+      };
+
+      goalsRepository.findOne.mockResolvedValue(goal);
+
+      await expect(service.createEntry('1')).rejects.toThrow(BadRequestException);
+      await expect(service.createEntry('1', undefined, 0)).rejects.toThrow(
+        BadRequestException,
+      );
+    });
+
     it('should throw ConflictException when entry already exists for today', async () => {
       const goal: Goal = {
         id: '1',
         userId: 'user1',
         title: 'exercise',
+        type: 'boolean',
         createdAt: new Date(),
         user: {
           id: 'user1',
@@ -228,6 +305,7 @@ describe('GoalsService', () => {
       const existingEntry: GoalEntry = {
         id: 'entry1',
         goalId: '1',
+        value: null,
         createdAt: new Date(),
       } as GoalEntry;
 
@@ -261,6 +339,38 @@ describe('GoalsService', () => {
       const result = await service.hasEntryForToday('1');
 
       expect(result).toBe(false);
+    });
+  });
+
+  describe('createGoal', () => {
+    it('should create a goal with default type', async () => {
+      const goal: Goal = {
+        id: '1',
+        userId: 'user1',
+        title: 'exercise',
+        type: 'boolean',
+        createdAt: new Date(),
+        user: {
+          id: 'user1',
+          name: 'John Doe',
+          email: 'john.doe@example.com',
+          createdAt: new Date(),
+          goals: [],
+        },
+        entries: [],
+      };
+
+      goalsRepository.create.mockReturnValue(goal);
+      goalsRepository.save.mockResolvedValue(goal);
+
+      const result = await service.createGoal('user1', 'exercise');
+
+      expect(result).toEqual(goal);
+      expect(goalsRepository.create).toHaveBeenCalledWith({
+        userId: 'user1',
+        title: 'exercise',
+        type: 'boolean',
+      });
     });
   });
 });
