@@ -12,7 +12,7 @@ export class AddGoalTypeAndEntryValue1750200000000
 
     await queryRunner.query(`
       ALTER TABLE "goal_entries"
-      ADD COLUMN IF NOT EXISTS "value" numeric(10,2)
+      ADD COLUMN IF NOT EXISTS "value" numeric(6,2)
     `);
 
     await queryRunner.query(`

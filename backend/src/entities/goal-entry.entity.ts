@@ -23,7 +23,7 @@ export class GoalEntry {
 
   @Column({
     type: 'decimal',
-    precision: 10,
+    precision: 6,
     scale: 2,
     nullable: true,
     transformer: {
