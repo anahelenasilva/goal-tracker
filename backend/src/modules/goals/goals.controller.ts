@@ -33,6 +33,7 @@ export class GoalsController {
     return this.goalsService.findAll();
   }
 
+  // TODO: add auth guard when multi-user support is needed
   @Post()
   @HttpCode(HttpStatus.CREATED)
   async createGoal(@Body() createGoalDto: CreateGoalDto): Promise<Goal> {
