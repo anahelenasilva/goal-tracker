@@ -17,12 +17,16 @@ type TreadmillExportProps = {
 
 type DaylogExportButtonProps = WorkoutExportProps | TreadmillExportProps;
 
+function isWorkoutExport(props: DaylogExportButtonProps): props is WorkoutExportProps {
+  return props.treadmillEntry === undefined;
+}
+
 export function DaylogExportButton(props: DaylogExportButtonProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [copyState, setCopyState] = useState<CopyState>('idle');
 
   const commands = useMemo(() => {
-    if ('sets' in props) {
+    if (isWorkoutExport(props)) {
       return generateDaylogCommands(props.sets);
     }
 
