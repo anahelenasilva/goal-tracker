@@ -17,21 +17,19 @@ type TreadmillExportProps = {
 
 type DaylogExportButtonProps = WorkoutExportProps | TreadmillExportProps;
 
-function isWorkoutExport(props: DaylogExportButtonProps): props is WorkoutExportProps {
-  return props.treadmillEntry === undefined;
-}
-
 export function DaylogExportButton(props: DaylogExportButtonProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [copyState, setCopyState] = useState<CopyState>('idle');
 
+  const { sets, treadmillEntry } = props;
+
   const commands = useMemo(() => {
-    if (isWorkoutExport(props)) {
-      return generateDaylogCommands(props.sets);
+    if (sets !== undefined) {
+      return generateDaylogCommands(sets);
     }
 
-    return generateTreadmillDaylogCommand(props.treadmillEntry);
-  }, [props]);
+    return generateTreadmillDaylogCommand(treadmillEntry!);
+  }, [sets, treadmillEntry]);
 
   useEffect(() => {
     if (copyState !== 'copied') {
@@ -93,8 +91,12 @@ export function DaylogExportButton(props: DaylogExportButtonProps) {
           role="dialog"
           aria-modal="true"
           aria-labelledby="daylog-export-title"
+          onClick={() => setIsOpen(false)}
         >
-          <div className="bg-gray-900 rounded-lg p-6 w-full max-w-2xl border border-gray-800">
+          <div
+            className="bg-gray-900 rounded-lg p-6 w-full max-w-2xl border border-gray-800"
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="flex items-center justify-between mb-4">
               <h3 id="daylog-export-title" className="text-xl font-bold text-white">
                 Daylog commands
