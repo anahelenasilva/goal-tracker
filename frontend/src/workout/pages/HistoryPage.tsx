@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useWorkoutProviders } from '../hooks';
 import type { Exercise, ExerciseHistoryEntry, WorkoutSession, WorkoutSet } from '../types';
-import { getExerciseDisplayName, getExerciseEnglishName } from '../utils';
+import { getExerciseDisplayName, getExerciseEnglishName, WEIGHT_UNIT_SUFFIX } from '../utils';
 import { SetLoggingForm } from '../components/SetLoggingForm';
 
 function formatDateTime(isoString: string): string {
@@ -198,7 +198,7 @@ function SessionDetail({
                   <span className="text-gray-500 font-medium w-6">#{index + 1}</span>
                   <span className="text-white">
                     {set.sets > 1 ? `${set.sets} × ` : ''}
-                    {set.reps} reps{set.weight != null ? ` @ ${set.weight}kg` : ''}
+                    {set.reps} reps{set.weight != null ? ` @ ${set.weight}${WEIGHT_UNIT_SUFFIX}` : ''}
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
@@ -292,7 +292,7 @@ function ExerciseHistoryDetail({
                 <span className="text-gray-500 font-medium w-6">#{index + 1}</span>
                 <span className="text-white">
                   {set.sets > 1 ? `${set.sets} × ` : ''}
-                  {set.reps} reps{set.weight != null ? ` @ ${set.weight}kg` : ''}
+                  {set.reps} reps{set.weight != null ? ` @ ${set.weight}${WEIGHT_UNIT_SUFFIX}` : ''}
                 </span>
               </div>
               {set.notes && (
