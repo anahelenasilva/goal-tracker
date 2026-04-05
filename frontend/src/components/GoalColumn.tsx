@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import type { Goal, GoalEntry } from '../services/api';
 import { api } from '../services/api';
-import { EntryList } from './EntryList';
+import { DaylogExportButton } from '../workout/components';
 
 interface GoalColumnProps {
   goal: Goal;
@@ -152,7 +152,40 @@ export function GoalColumn({ goal, onEntryAdded }: GoalColumnProps) {
         </div>
       )}
 
-      <EntryList entries={entries} loading={loading} />
+      {loading && entries.length === 0 ? (
+        <div className="text-center py-8 text-gray-400">
+          Loading entries...
+        </div>
+      ) : entries.length === 0 ? (
+        <div className="text-center py-8 text-gray-400">
+          No entries yet. Add your first entry!
+        </div>
+      ) : (
+        <div className="space-y-2">
+          <h3 className="text-sm font-semibold text-gray-300 mb-3">Recent Entries</h3>
+          <div className="max-h-96 overflow-y-auto space-y-2">
+            {entries.map((entry) => (
+              <div
+                key={entry.id}
+                className="p-3 bg-gray-800 rounded border border-gray-700 hover:bg-gray-750 transition-colors flex items-center justify-between gap-2"
+              >
+                <time className="text-sm text-gray-300">
+                  {new Date(entry.createdAt).toLocaleDateString('en-US', {
+                    weekday: 'short',
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric',
+                  })}
+                  {entry.value !== null && ` - ${entry.value} min`}
+                </time>
+                {goal.type === 'treadmill' && entry.value != null && (
+                  <DaylogExportButton treadmillEntry={entry} />
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
