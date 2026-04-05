@@ -11,7 +11,6 @@ Add a "Daylog" button on completed workout sessions in goal-tracker that generat
 ```bash
 pnpm run log exercise supino_reto 80x5,85x3
 pnpm run log exercise agachamento 100x5,100x5,100x5
-pnpm run log type lifting
 ```
 
 **Treadmill goal entry** with 30 minutes:
@@ -70,8 +69,6 @@ function generateDaylogCommands(sets: WorkoutSet[]): string {
     lines.push(`pnpm run log exercise ${name} ${notation}`);
   }
 
-  lines.push('pnpm run log type lifting');
-
   return lines.join('\n');
 }
 ```
@@ -81,7 +78,6 @@ function generateDaylogCommands(sets: WorkoutSet[]): string {
 - Lowercased + spaces→underscores
 - Multi-set entries (sets > 1) expand: `sets=3, 80kg, 5reps` → `80x5,80x5,80x5`
 - Bodyweight exercises use `0x<reps>` (e.g., `0x8`) — compatible with daylog's `estimateOneRM` regex
-- `pnpm run log type lifting` always appended (workout sessions = lifting)
 - Treadmill export is a separate flow, triggered from goal entry UI (see section below)
 
 **Canonical contract (goal-tracker → daylog):**
@@ -189,8 +185,8 @@ The `DaylogExportButton` component accepts either `sets` (workout session) or `t
 
 ### Unit tests — `generateDaylogCommands`
 
-- Two exercises, multiple sets → correct grouped output ending with `type lifting`
-- Empty sets array → returns only `type lifting` line
+- Two exercises, multiple sets → correct grouped output
+- Empty sets array → returns empty string
 - Exercise without `namePt` → uses English `name`
 - Preserves exercise order from sets array (Map insertion order)
 
