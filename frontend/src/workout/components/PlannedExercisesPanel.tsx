@@ -198,7 +198,7 @@ function QuickAddForm({ exercise, lastSet, onSubmit, onCancel }: QuickAddFormPro
   return (
     <form onSubmit={handleSubmit} className="mt-1 p-3 bg-gray-800/50 rounded-lg border border-gray-700">
       <div className="flex flex-wrap gap-2 items-end">
-        <div className="flex-1 min-w-[4rem]">
+        <div className="flex-1 min-w-16">
           <label className="block text-xs text-gray-400 mb-1">Reps</label>
           <input
             type="number"
@@ -222,7 +222,7 @@ function QuickAddForm({ exercise, lastSet, onSubmit, onCancel }: QuickAddFormPro
             className="w-full px-2 py-1.5 bg-gray-800 border border-gray-700 rounded text-white text-sm placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
           />
         </div>
-        <div className="flex-1 min-w-[4rem]">
+        <div className="flex-1 min-w-16">
           <label className="block text-xs text-gray-400 mb-1">Weight</label>
           <input
             type="number"
