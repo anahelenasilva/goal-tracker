@@ -1,5 +1,4 @@
 import { IsIn, IsNotEmpty, IsOptional, IsString, IsUUID } from 'class-validator';
-import { GoalType } from '../../../entities/goal.entity';
 
 export class CreateGoalDto {
   @IsUUID()
@@ -12,5 +11,5 @@ export class CreateGoalDto {
 
   @IsOptional()
   @IsIn(['boolean', 'treadmill'])
-  type?: GoalType;
+  type?: 'boolean' | 'treadmill';
 }
