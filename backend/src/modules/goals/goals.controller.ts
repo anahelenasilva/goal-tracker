@@ -9,6 +9,7 @@ import {
 } from '@nestjs/common';
 import { GoalEntry } from '../../entities/goal-entry.entity';
 import { Goal } from '../../entities/goal.entity';
+import { CreateGoalDto } from './dto/create-goal.dto';
 import { CreateGoalEntryDto } from './dto/create-goal-entry.dto';
 import { GoalsService } from './goals.service';
 
@@ -30,6 +31,17 @@ export class GoalsController {
   @Get()
   async findAll(): Promise<Goal[]> {
     return this.goalsService.findAll();
+  }
+
+  // TODO: add auth guard when multi-user support is needed
+  @Post()
+  @HttpCode(HttpStatus.CREATED)
+  async createGoal(@Body() createGoalDto: CreateGoalDto): Promise<Goal> {
+    return this.goalsService.createGoal(
+      createGoalDto.userId,
+      createGoalDto.title,
+      createGoalDto.type,
+    );
   }
 
   @Get(':id')
@@ -55,6 +67,10 @@ export class GoalsController {
     @Param('id') id: string,
     @Body() createGoalEntryDto: CreateGoalEntryDto,
   ): Promise<GoalEntry> {
-    return this.goalsService.createEntry(id, createGoalEntryDto.createdAt);
+    return this.goalsService.createEntry(
+      id,
+      createGoalEntryDto.createdAt,
+      createGoalEntryDto.value,
+    );
   }
 }

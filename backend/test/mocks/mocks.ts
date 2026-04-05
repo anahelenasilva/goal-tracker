@@ -14,6 +14,7 @@ export const makeGoal = (overrides: Partial<Goal> = {}): Goal => ({
   id: '1',
   userId: 'user1',
   title: 'exercise',
+  type: 'exercise',
   createdAt: new Date(),
   user: makeUser(),
   entries: [],

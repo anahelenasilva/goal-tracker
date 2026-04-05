@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ConflictException,
   Injectable,
   NotFoundException,
@@ -6,7 +7,7 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { Between, Repository } from 'typeorm';
 import { GoalEntry } from '../../entities/goal-entry.entity';
-import { Goal } from '../../entities/goal.entity';
+import { Goal, GoalType } from '../../entities/goal.entity';
 
 @Injectable()
 export class GoalsService {
@@ -36,6 +37,15 @@ export class GoalsService {
     return goal;
   }
 
+  async createGoal(
+    userId: string,
+    title: string,
+    type: GoalType = 'exercise',
+  ): Promise<Goal> {
+    const goal = this.goalsRepository.create({ userId, title, type });
+    return this.goalsRepository.save(goal);
+  }
+
   async getGoalEntries(goalId: string): Promise<GoalEntry[]> {
     const goal = await this.findOne(goalId);
     return this.goalEntriesRepository.find({
@@ -51,8 +61,20 @@ export class GoalsService {
     });
   }
 
-  async createEntry(goalId: string, createdAt?: string): Promise<GoalEntry> {
+  async createEntry(
+    goalId: string,
+    createdAt?: string,
+    value?: number,
+  ): Promise<GoalEntry> {
     const goal = await this.findOne(goalId);
+
+    if (goal.type === 'treadmill') {
+      if (value === undefined || value === null || value <= 0) {
+        throw new BadRequestException(
+          'Treadmill entries require a positive value',
+        );
+      }
+    }
 
     const entryDate = createdAt ? new Date(createdAt) : new Date();
     const hasEntryForDate = await this.hasEntryForDate(goalId, entryDate);
@@ -66,6 +88,7 @@ export class GoalsService {
     const entry = this.goalEntriesRepository.create({
       goalId: goal.id,
       createdAt: entryDate,
+      ...(value !== undefined && { value }),
     });
 
     return this.goalEntriesRepository.save(entry);

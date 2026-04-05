@@ -21,6 +21,24 @@ export class GoalEntry {
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 
+  @Column({
+    type: 'decimal',
+    precision: 6,
+    scale: 2,
+    nullable: true,
+    transformer: {
+      to: (value: number | null) => value,
+      from: (value: string | null) => {
+        if (value === null) {
+          return null;
+        }
+        const parsedValue = Number(value);
+        return Number.isFinite(parsedValue) ? parsedValue : null;
+      },
+    },
+  })
+  value: number | null;
+
   @ManyToOne(() => Goal, (goal) => goal.entries)
   @JoinColumn({ name: 'goal_id' })
   goal: Goal;
