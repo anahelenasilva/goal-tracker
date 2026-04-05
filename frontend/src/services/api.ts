@@ -12,7 +12,7 @@ export interface Goal {
 export interface GoalEntry {
   id: string;
   goalId: string;
-  value?: number | null;
+  value: number | null;
   createdAt: string;
   goal?: {
     id: string;
