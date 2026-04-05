@@ -1,4 +1,4 @@
-export type GoalType = 'boolean' | 'treadmill';
+export type GoalType = 'exercise' | 'treadmill';
 
 export interface Goal {
   id: string;

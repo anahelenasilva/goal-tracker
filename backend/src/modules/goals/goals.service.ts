@@ -40,7 +40,7 @@ export class GoalsService {
   async createGoal(
     userId: string,
     title: string,
-    type: GoalType = 'boolean',
+    type: GoalType = 'exercise',
   ): Promise<Goal> {
     const goal = this.goalsRepository.create({ userId, title, type });
     return this.goalsRepository.save(goal);

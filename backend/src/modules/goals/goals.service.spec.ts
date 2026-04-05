@@ -48,7 +48,7 @@ describe('GoalsService', () => {
           id: '1',
           userId: 'user1',
           title: 'exercise',
-          type: 'boolean',
+          type: 'exercise',
           createdAt: new Date(),
           user: {
             id: 'user1',
@@ -78,7 +78,7 @@ describe('GoalsService', () => {
         id: '1',
         userId: 'user1',
         title: 'exercise',
-        type: 'boolean',
+        type: 'exercise',
         createdAt: new Date(),
         user: {
           id: 'user1',
@@ -114,7 +114,7 @@ describe('GoalsService', () => {
         id: '1',
         userId: 'user1',
         title: 'exercise',
-        type: 'boolean',
+        type: 'exercise',
         createdAt: new Date(),
         user: {
           id: 'user1',
@@ -154,7 +154,7 @@ describe('GoalsService', () => {
         id: '1',
         userId: 'user1',
         title: 'exercise',
-        type: 'boolean',
+        type: 'exercise',
         createdAt: new Date(),
         user: {
           id: 'user1',
@@ -184,7 +184,7 @@ describe('GoalsService', () => {
         id: '1',
         userId: 'user1',
         title: 'exercise',
-        type: 'boolean',
+        type: 'exercise',
         createdAt: new Date(),
         user: {
           id: 'user1',
@@ -290,7 +290,7 @@ describe('GoalsService', () => {
         id: '1',
         userId: 'user1',
         title: 'exercise',
-        type: 'boolean',
+        type: 'exercise',
         createdAt: new Date(),
         user: {
           id: 'user1',
@@ -301,13 +301,6 @@ describe('GoalsService', () => {
         },
         entries: [],
       };
-
-      const existingEntry: GoalEntry = {
-        id: 'entry1',
-        goalId: '1',
-        value: null,
-        createdAt: new Date(),
-      } as GoalEntry;
 
       goalsRepository.findOne.mockResolvedValue(goal);
       goalEntriesRepository.count.mockResolvedValue(1);
@@ -348,7 +341,7 @@ describe('GoalsService', () => {
         id: '1',
         userId: 'user1',
         title: 'exercise',
-        type: 'boolean',
+        type: 'exercise',
         createdAt: new Date(),
         user: {
           id: 'user1',
@@ -369,7 +362,7 @@ describe('GoalsService', () => {
       expect(goalsRepository.create).toHaveBeenCalledWith({
         userId: 'user1',
         title: 'exercise',
-        type: 'boolean',
+        type: 'exercise',
       });
     });
   });

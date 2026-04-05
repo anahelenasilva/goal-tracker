@@ -10,6 +10,6 @@ export class CreateGoalDto {
   title: string;
 
   @IsOptional()
-  @IsIn(['boolean', 'treadmill'])
-  type?: 'boolean' | 'treadmill';
+  @IsIn(['exercise', 'treadmill'])
+  type?: 'exercise' | 'treadmill';
 }

@@ -2,8 +2,8 @@
 
 ## Goal
 
-1. Add a `type` field to `Goal` to distinguish goal kinds (e.g., `boolean`, `treadmill`). This determines UI behavior (value input visibility) and enables the daylog export to generate the correct command per goal type.
-2. Extend `GoalEntry` to support an optional numeric `value` field, so goals like "treadmill" can store minutes (e.g., 30 min) instead of being purely boolean (logged/not logged).
+1. Add a `type` field to `Goal` to distinguish goal kinds (e.g., `exercise`, `treadmill`). This determines UI behavior (value input visibility) and enables the daylog export to generate the correct command per goal type.
+2. Extend `GoalEntry` to support an optional numeric `value` field, so goals like "treadmill" can store minutes (e.g., 30 min) instead of being purely exercise (logged/not logged).
 
 This enables the daylog export to generate `pnpm run log treadmill 30` with real data (see `daylog-export-plan.md`).
 
@@ -35,12 +35,12 @@ goal_entries
 **File:** `backend/src/migrations/<timestamp>-add-goal-type-and-entry-value.ts`
 
 ```sql
-ALTER TABLE goals ADD COLUMN type VARCHAR(20) NOT NULL DEFAULT 'boolean';
+ALTER TABLE goals ADD COLUMN type VARCHAR(20) NOT NULL DEFAULT 'exercise';
 ALTER TABLE goal_entries ADD COLUMN value DECIMAL(10,2) NULL;
 ```
 
-- `type` defaults to `'boolean'` — existing goals keep working with no changes.
-- `value` is nullable — existing boolean-style entries keep working with no value.
+- `type` defaults to `'exercise'` — existing goals keep working with no changes.
+- `value` is nullable — existing exercise entries keep working with no value.
 
 Seed existing treadmill goal:
 ```sql
@@ -53,13 +53,13 @@ UPDATE goals SET type = 'treadmill' WHERE LOWER(title) = 'treadmill';
 
 Add:
 ```ts
-@Column({ type: 'varchar', length: 20, default: 'boolean' })
+@Column({ type: 'varchar', length: 20, default: 'exercise' })
 type: GoalType;
 ```
 
 With type:
 ```ts
-export type GoalType = 'boolean' | 'treadmill';
+export type GoalType = 'exercise' | 'treadmill';
 ```
 
 #### 3. Update GoalEntry entity
@@ -103,7 +103,7 @@ export class CreateGoalDto {
   title: string;
 
   @IsOptional()
-  @IsIn(['boolean', 'treadmill'])
+  @IsIn(['exercise', 'treadmill'])
   type?: GoalType;
 }
 ```
@@ -114,7 +114,7 @@ export class CreateGoalDto {
 
 Add method:
 ```ts
-async createGoal(userId: string, title: string, type: GoalType = 'boolean'): Promise<Goal> {
+async createGoal(userId: string, title: string, type: GoalType = 'exercise'): Promise<Goal> {
   const goal = this.goalsRepository.create({ userId, title, type });
   return this.goalsRepository.save(goal);
 }
@@ -151,7 +151,7 @@ value?: number;
 
 **File:** `backend/src/modules/goals/goals.service.ts`
 
-- `createGoal`: pass `type` through (defaults to `'boolean'`).
+- `createGoal`: pass `type` through (defaults to `'exercise'`).
 - `createEntry`: pass `value` through when creating the entry. **Validate:** if `goal.type === 'treadmill'` and `value` is null/undefined, throw `BadRequestException('Treadmill entries require a positive value')`. Also reject `value <= 0`.
 
 ```ts
@@ -192,7 +192,7 @@ No change needed — TypeORM will include `type` and `value` in serialized respo
 **File:** `frontend/src/services/api.ts`
 
 ```ts
-export type GoalType = 'boolean' | 'treadmill';
+export type GoalType = 'exercise' | 'treadmill';
 
 export interface Goal {
   id: string;
@@ -257,7 +257,7 @@ For goals with `type === 'treadmill'`:
 - Disable both "Add Entry" and "Yesterday" buttons when `value` is empty or <= 0
 - On submit, pass value to `addGoalEntry`, then reset input
 
-For goals with `type === 'boolean'`:
+For goals with `type === 'exercise'`:
 - No change — current toggle behavior. `value` state is unused.
 
 #### 11. Update EntryList display
@@ -272,22 +272,22 @@ See `daylog-export-plan.md` for full details. Once `Goal.type` and `GoalEntry.va
 
 ## Files Changed
 
-| File | Change |
-|------|--------|
-| `backend/src/migrations/<ts>-add-goal-type-and-entry-value.ts` | New migration: add `type` to goals, `value` to goal_entries |
-| `backend/src/entities/goal.entity.ts` | Add `type` field |
-| `backend/src/entities/goal-entry.entity.ts` | Add `value` field |
-| `backend/src/modules/goals/dto/create-goal.dto.ts` | **New file:** CreateGoalDto with `title` and optional `type` |
-| `backend/src/modules/goals/goals.controller.ts` | Add `POST /goals` endpoint |
-| `backend/src/modules/goals/dto/create-goal-entry.dto.ts` | Add `value` to DTO |
-| `backend/src/modules/goals/goals.service.ts` | Pass `type` and `value` through on create |
-| `frontend/src/services/api.ts` | Update `Goal` type (add `type`), `GoalEntry` type (add `value`), `addGoalEntry` signature |
-| `frontend/src/components/GoalColumn.tsx` | Show value input for `treadmill` type goals |
-| `frontend/src/components/EntryList.tsx` | Show value when present |
+| File                                                           | Change                                                                                    |
+| -------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| `backend/src/migrations/<ts>-add-goal-type-and-entry-value.ts` | New migration: add `type` to goals, `value` to goal_entries                               |
+| `backend/src/entities/goal.entity.ts`                          | Add `type` field                                                                          |
+| `backend/src/entities/goal-entry.entity.ts`                    | Add `value` field                                                                         |
+| `backend/src/modules/goals/dto/create-goal.dto.ts`             | **New file:** CreateGoalDto with `title` and optional `type`                              |
+| `backend/src/modules/goals/goals.controller.ts`                | Add `POST /goals` endpoint                                                                |
+| `backend/src/modules/goals/dto/create-goal-entry.dto.ts`       | Add `value` to DTO                                                                        |
+| `backend/src/modules/goals/goals.service.ts`                   | Pass `type` and `value` through on create                                                 |
+| `frontend/src/services/api.ts`                                 | Update `Goal` type (add `type`), `GoalEntry` type (add `value`), `addGoalEntry` signature |
+| `frontend/src/components/GoalColumn.tsx`                       | Show value input for `treadmill` type goals                                               |
+| `frontend/src/components/EntryList.tsx`                        | Show value when present                                                                   |
 
 ## Migration Safety
 
-- `goals.type` defaults to `'boolean'` → existing goals keep working
+- `goals.type` defaults to `'exercise'` → existing goals keep working
 - `goal_entries.value` is nullable → existing entries get `NULL`, no data loss
 - API is backward compatible: both `type` and `value` are optional in DTOs
 

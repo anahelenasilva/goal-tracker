@@ -51,7 +51,7 @@ describe('GoalsController', () => {
         id: '1',
         userId: 'user1',
         title: 'exercise',
-        type: 'boolean',
+        type: 'exercise',
         createdAt: new Date(),
         user: {
           id: 'user1',
