@@ -75,7 +75,6 @@ describe('Workouts E2E', () => {
           exerciseId,
           reps: 10,
           weight: 100,
-          weightUnit: 'kg',
         })
         .expect(201);
 
@@ -91,7 +90,6 @@ describe('Workouts E2E', () => {
           exerciseId,
           reps: 12,
           weight: 105,
-          weightUnit: 'kg',
         })
         .expect(201);
 
@@ -147,7 +145,6 @@ describe('Workouts E2E', () => {
           exerciseId,
           reps: 10,
           weight: 100,
-          weightUnit: 'kg',
         })
         .expect(409);
     });

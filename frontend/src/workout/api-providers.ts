@@ -73,7 +73,6 @@ function mapWorkoutSet(data: Record<string, unknown>): WorkoutSet {
     reps: data.reps as number,
     sets: typeof data.sets === 'number' ? data.sets : 1,
     weight: data.weight == null ? null : Number(data.weight),
-    weightUnit: data.weightUnit as WorkoutSet['weightUnit'],
     notes: data.notes as string | undefined,
     createdAt: data.createdAt as string,
   };

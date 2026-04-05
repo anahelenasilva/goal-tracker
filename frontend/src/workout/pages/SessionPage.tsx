@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useWorkoutProviders } from '../hooks';
 import { PlanSelectionPanel, PlannedExercisesPanel, SetList, SetLoggingForm } from '../components';
-import type { WorkoutSession, WorkoutSet, WeightUnit } from '../types';
+import type { WorkoutSession, WorkoutSet } from '../types';
 
 export function WorkoutSessionPage() {
   const { sessions, sets } = useWorkoutProviders();
@@ -53,7 +53,6 @@ export function WorkoutSessionPage() {
     reps: number;
     sets: number;
     weight: number | null;
-    weightUnit: WeightUnit;
     notes?: string;
   }) => {
     if (!activeSession) return;
@@ -62,7 +61,6 @@ export function WorkoutSessionPage() {
       reps: data.reps,
       sets: data.sets,
       weight: data.weight,
-      weightUnit: data.weightUnit,
       notes: data.notes,
     });
     setSessionSets((prev) => [...prev, newSet]);

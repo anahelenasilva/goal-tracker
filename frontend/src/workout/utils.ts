@@ -1,5 +1,7 @@
 import type { Exercise } from './types';
 
+export const WEIGHT_UNIT_SUFFIX = 'kg';
+
 export function getExerciseDisplayName(exercise: Exercise): string {
   return exercise.namePt || exercise.name;
 }

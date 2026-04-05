@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useWorkoutProviders } from '../hooks';
-import type { Exercise, TrainingPlan, WorkoutSet, WeightUnit } from '../types';
+import type { Exercise, TrainingPlan, WorkoutSet } from '../types';
 import { getExerciseDisplayName, getExerciseEnglishName } from '../utils';
 
 interface PlannedExercisesPanelProps {
@@ -11,7 +11,6 @@ interface PlannedExercisesPanelProps {
     reps: number;
     sets: number;
     weight: number | null;
-    weightUnit: WeightUnit;
     notes?: string;
   }) => Promise<void>;
 }
@@ -139,7 +138,6 @@ interface QuickAddFormProps {
     reps: number;
     sets: number;
     weight: number | null;
-    weightUnit: WeightUnit;
     notes?: string;
   }) => Promise<void>;
   onCancel: () => void;
@@ -151,7 +149,6 @@ function QuickAddForm({ exercise, lastSet, onSubmit, onCancel }: QuickAddFormPro
   const [weight, setWeight] = useState(
     lastSet?.weight != null ? lastSet.weight.toString() : '',
   );
-  const [unit, setUnit] = useState<WeightUnit>(lastSet?.weightUnit || 'kg');
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -192,7 +189,6 @@ function QuickAddForm({ exercise, lastSet, onSubmit, onCancel }: QuickAddFormPro
         reps: repsNum,
         sets: setsNum,
         weight: weightNum,
-        weightUnit: unit,
       });
     } finally {
       setSubmitting(false);
@@ -237,17 +233,6 @@ function QuickAddForm({ exercise, lastSet, onSubmit, onCancel }: QuickAddFormPro
             placeholder="100"
             className="w-full px-2 py-1.5 bg-gray-800 border border-gray-700 rounded text-white text-sm placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
           />
-        </div>
-        <div className="w-16">
-          <label className="block text-xs text-gray-400 mb-1">Unit</label>
-          <select
-            value={unit}
-            onChange={(e) => setUnit(e.target.value as WeightUnit)}
-            className="w-full px-2 py-1.5 bg-gray-800 border border-gray-700 rounded text-white text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
-          >
-            <option value="kg">kg</option>
-            <option value="lb">lb</option>
-          </select>
         </div>
         <button
           type="submit"

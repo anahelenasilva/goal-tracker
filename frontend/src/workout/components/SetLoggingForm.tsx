@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import type { Exercise, WeightUnit, WorkoutSet } from '../types';
+import type { Exercise, WorkoutSet } from '../types';
 import { ExercisePicker } from './ExercisePicker';
 
 interface SetLoggingFormProps {
@@ -8,7 +8,6 @@ interface SetLoggingFormProps {
     reps: number;
     sets: number;
     weight: number | null;
-    weightUnit: WeightUnit;
     notes?: string;
   }) => Promise<void>;
   lastSet?: WorkoutSet | null;
@@ -22,7 +21,6 @@ export function SetLoggingForm({ onSubmit, lastSet, allowedExerciseIds }: SetLog
   const [weight, setWeight] = useState<string>(
     lastSet?.weight != null ? lastSet.weight.toString() : '',
   );
-  const [unit, setUnit] = useState<WeightUnit>(lastSet?.weightUnit || 'kg');
   const [notes, setNotes] = useState<string>(lastSet?.notes || '');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -70,7 +68,6 @@ export function SetLoggingForm({ onSubmit, lastSet, allowedExerciseIds }: SetLog
         reps: repsNum,
         sets: setsNum,
         weight: weightNum,
-        weightUnit: unit,
         notes: notes.trim() || undefined,
       });
       setReps('');
@@ -90,7 +87,6 @@ export function SetLoggingForm({ onSubmit, lastSet, allowedExerciseIds }: SetLog
       setReps(lastSet.reps.toString());
       setSets((lastSet.sets ?? 1).toString());
       setWeight(lastSet.weight != null ? lastSet.weight.toString() : '');
-      setUnit(lastSet.weightUnit);
     }
   };
 
@@ -106,7 +102,7 @@ export function SetLoggingForm({ onSubmit, lastSet, allowedExerciseIds }: SetLog
         />
       </div>
 
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
         <div>
           <label className="block text-sm font-medium text-gray-300 mb-1">Reps</label>
           <input
@@ -145,17 +141,6 @@ export function SetLoggingForm({ onSubmit, lastSet, allowedExerciseIds }: SetLog
           />
         </div>
 
-        <div>
-          <label className="block text-sm font-medium text-gray-300 mb-1">Unit</label>
-          <select
-            value={unit}
-            onChange={(e) => setUnit(e.target.value as WeightUnit)}
-            className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            <option value="kg">kg</option>
-            <option value="lb">lb</option>
-          </select>
-        </div>
       </div>
 
       <div>

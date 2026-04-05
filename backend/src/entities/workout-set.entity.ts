@@ -9,8 +9,6 @@ import {
 import { Exercise } from './exercise.entity';
 import { WorkoutSession } from './workout-session.entity';
 
-export type WeightUnit = 'kg' | 'lb';
-
 @Entity('workout_sets')
 export class WorkoutSet {
   @PrimaryGeneratedColumn('uuid')
@@ -45,9 +43,6 @@ export class WorkoutSet {
     },
   })
   weight: number | null;
-
-  @Column({ name: 'weight_unit', type: 'varchar' })
-  weightUnit: WeightUnit;
 
   @Column({ type: 'varchar', nullable: true })
   notes: string | null;

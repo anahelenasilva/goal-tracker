@@ -1,7 +1,4 @@
-import { IsIn, IsInt, IsOptional, IsString, IsUUID, MaxLength, Min } from 'class-validator';
-import type { WeightUnit } from '../../../entities/workout-set.entity';
-
-const WEIGHT_UNITS: WeightUnit[] = ['kg', 'lb'];
+import { IsInt, IsOptional, IsString, IsUUID, MaxLength, Min } from 'class-validator';
 
 export class UpdateWorkoutSetDto {
   @IsOptional()
@@ -21,10 +18,6 @@ export class UpdateWorkoutSetDto {
   @IsOptional()
   @Min(0)
   weight?: number;
-
-  @IsOptional()
-  @IsIn(WEIGHT_UNITS)
-  weightUnit?: WeightUnit;
 
   @IsOptional()
   @IsString()

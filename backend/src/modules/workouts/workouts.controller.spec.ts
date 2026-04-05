@@ -39,7 +39,6 @@ const makeSet = (overrides: Partial<WorkoutSet> = {}): WorkoutSet => ({
   reps: 10,
   sets: 1,
   weight: 100,
-  weightUnit: 'kg',
   notes: null,
   createdAt: new Date(),
   session: makeSession(),
@@ -313,7 +312,7 @@ describe('WorkoutsController', () => {
 
     describe('POST /workouts/sessions/:sessionId/sets', () => {
       it('should add a set to a session', async () => {
-        const dto = { exerciseId: 'exercise-1', reps: 10, weight: 100, weightUnit: 'kg' as const };
+        const dto = { exerciseId: 'exercise-1', reps: 10, weight: 100 };
         const set = makeSet();
         service.addSet.mockResolvedValue(set);
 
@@ -324,7 +323,7 @@ describe('WorkoutsController', () => {
       });
 
       it('should add a set with null weight', async () => {
-        const dto = { exerciseId: 'exercise-1', reps: 12, weight: null, weightUnit: 'kg' as const };
+        const dto = { exerciseId: 'exercise-1', reps: 12, weight: null };
         const set = makeSet({ reps: 12, weight: null });
         service.addSet.mockResolvedValue(set);
 
@@ -335,7 +334,7 @@ describe('WorkoutsController', () => {
       });
 
       it('should throw ConflictException for non-active session', async () => {
-        const dto = { exerciseId: 'exercise-1', reps: 10, weight: 100, weightUnit: 'kg' as const };
+        const dto = { exerciseId: 'exercise-1', reps: 10, weight: 100 };
         service.addSet.mockRejectedValue(new ConflictException());
 
         await expect(controller.addSet('session-1', dto)).rejects.toThrow(

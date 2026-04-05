@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import type { Exercise, WorkoutSet } from '../types';
-import { getExerciseDisplayName, getExerciseEnglishName } from '../utils';
+import { getExerciseDisplayName, getExerciseEnglishName, WEIGHT_UNIT_SUFFIX } from '../utils';
 
 interface SetListProps {
   sets: WorkoutSet[];
@@ -57,7 +57,7 @@ export function SetList({ sets, onDelete }: SetListProps) {
                   <span className="text-gray-500 font-medium">#{index + 1}</span>
                   <span className="text-white">
                     {set.sets > 1 ? `${set.sets} × ` : ''}
-                    {set.reps} reps{set.weight != null ? ` @ ${set.weight}${set.weightUnit}` : ''}
+                    {set.reps} reps{set.weight != null ? ` @ ${set.weight}${WEIGHT_UNIT_SUFFIX}` : ''}
                   </span>
                   {set.notes && (
                     <span className="text-gray-400 text-sm truncate max-w-32">
