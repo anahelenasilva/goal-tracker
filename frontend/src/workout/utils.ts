@@ -1,3 +1,4 @@
+import type { GoalEntry } from '../services/api';
 import type { Exercise, WorkoutSet } from './types';
 
 export const WEIGHT_UNIT_SUFFIX = 'kg';
@@ -64,4 +65,12 @@ export function generateDaylogCommands(sets: WorkoutSet[]): string {
   lines.push('pnpm run log type lifting');
 
   return lines.join('\n');
+}
+
+export function generateTreadmillDaylogCommand(entry: GoalEntry): string | null {
+  if (entry.value == null) {
+    return null;
+  }
+
+  return `pnpm run log treadmill ${entry.value}`;
 }
