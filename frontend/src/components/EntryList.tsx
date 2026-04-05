@@ -38,6 +38,7 @@ export function EntryList({ entries, loading }: EntryListProps) {
                 month: 'short',
                 day: 'numeric',
               })}
+              {entry.value !== undefined && entry.value !== null && ` - ${entry.value} min`}
             </time>
           </div>
         ))}

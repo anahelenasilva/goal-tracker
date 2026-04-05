@@ -9,11 +9,13 @@ interface GoalColumnProps {
 }
 
 export function GoalColumn({ goal, onEntryAdded }: GoalColumnProps) {
+  const isTreadmillGoal = goal.type === 'treadmill';
   const [entries, setEntries] = useState<GoalEntry[]>([]);
   const [count, setCount] = useState(0);
   const [hasEntryToday, setHasEntryToday] = useState(false);
   const [hasEntryYesterday, setHasEntryYesterday] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [value, setValue] = useState<number | undefined>(undefined);
   const [error, setError] = useState<string | null>(null);
 
   const loadEntries = useCallback(async () => {
@@ -41,8 +43,13 @@ export function GoalColumn({ goal, onEntryAdded }: GoalColumnProps) {
     try {
       setLoading(true);
       setError(null);
-      await api.addGoalEntry(goal.id);
+      await api.addGoalEntry(
+        goal.id,
+        undefined,
+        isTreadmillGoal ? value : undefined,
+      );
       await loadEntries();
+      setValue(undefined);
       onEntryAdded?.();
     } catch (err) {
       if (err instanceof Error) {
@@ -62,8 +69,13 @@ export function GoalColumn({ goal, onEntryAdded }: GoalColumnProps) {
       setError(null);
       const yesterday = new Date();
       yesterday.setDate(yesterday.getDate() - 1);
-      await api.addGoalEntry(goal.id, yesterday);
+      await api.addGoalEntry(
+        goal.id,
+        yesterday,
+        isTreadmillGoal ? value : undefined,
+      );
       await loadEntries();
+      setValue(undefined);
       onEntryAdded?.();
     } catch (err) {
       if (err instanceof Error) {
@@ -77,12 +89,34 @@ export function GoalColumn({ goal, onEntryAdded }: GoalColumnProps) {
     }
   };
 
+  const hasValidValue = !isTreadmillGoal || (value !== undefined && value > 0);
+
   return (
     <div className="bg-gray-900 rounded-lg shadow-xl border border-gray-800 p-6">
       <div className="mb-4">
         <h2 className="text-2xl font-bold text-white capitalize mb-2">
           {goal.title}
         </h2>
+        {isTreadmillGoal && (
+          <div className="mb-3">
+            <input
+              type="number"
+              min="0.01"
+              step="0.01"
+              placeholder="min"
+              value={value ?? ''}
+              onChange={(event) => {
+                const nextValue = event.target.valueAsNumber;
+                if (Number.isNaN(nextValue)) {
+                  setValue(undefined);
+                  return;
+                }
+                setValue(nextValue);
+              }}
+              className="w-full rounded-md border border-gray-700 bg-gray-800 px-3 py-2 text-gray-100 placeholder:text-gray-500 focus:border-blue-500 focus:outline-none"
+            />
+          </div>
+        )}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <span className="text-gray-400 text-sm">
             Total entries: <span className="font-semibold text-gray-200">{count}</span>
@@ -90,8 +124,8 @@ export function GoalColumn({ goal, onEntryAdded }: GoalColumnProps) {
           <div className="flex gap-2">
             <button
               onClick={handleAddYesterdayEntry}
-              disabled={hasEntryYesterday || loading}
-              className={`flex-1 sm:flex-none px-3 py-2 rounded-md font-medium text-sm transition-colors ${hasEntryYesterday || loading
+              disabled={hasEntryYesterday || loading || !hasValidValue}
+              className={`flex-1 sm:flex-none px-3 py-2 rounded-md font-medium text-sm transition-colors ${hasEntryYesterday || loading || !hasValidValue
                 ? 'bg-gray-700 text-gray-500 cursor-not-allowed'
                 : 'bg-purple-600 text-white hover:bg-purple-500'
                 }`}
@@ -100,8 +134,8 @@ export function GoalColumn({ goal, onEntryAdded }: GoalColumnProps) {
             </button>
             <button
               onClick={handleAddEntry}
-              disabled={hasEntryToday || loading}
-              className={`flex-1 sm:flex-none px-3 py-2 rounded-md font-medium text-sm transition-colors ${hasEntryToday || loading
+              disabled={hasEntryToday || loading || !hasValidValue}
+              className={`flex-1 sm:flex-none px-3 py-2 rounded-md font-medium text-sm transition-colors ${hasEntryToday || loading || !hasValidValue
                 ? 'bg-gray-700 text-gray-500 cursor-not-allowed'
                 : 'bg-blue-600 text-white hover:bg-blue-500'
                 }`}

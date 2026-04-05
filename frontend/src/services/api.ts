@@ -1,7 +1,10 @@
+export type GoalType = 'boolean' | 'treadmill';
+
 export interface Goal {
   id: string;
   userId: string;
   title: string;
+  type: GoalType;
   createdAt: string;
   entries?: GoalEntry[];
 }
@@ -9,6 +12,7 @@ export interface Goal {
 export interface GoalEntry {
   id: string;
   goalId: string;
+  value?: number | null;
   createdAt: string;
   goal?: {
     id: string;
@@ -66,8 +70,14 @@ export const api = {
     return response.json();
   },
 
-  async addGoalEntry(goalId: string, date?: Date): Promise<GoalEntry> {
-    const body = date ? { createdAt: date.toISOString() } : {};
+  async addGoalEntry(goalId: string, date?: Date, value?: number): Promise<GoalEntry> {
+    const body: Record<string, unknown> = {};
+    if (date) {
+      body.createdAt = date.toISOString();
+    }
+    if (value !== undefined) {
+      body.value = value;
+    }
 
     const response = await fetch(`${getApiBaseUrl()}/goals/${goalId}/entries`, {
       method: 'POST',
