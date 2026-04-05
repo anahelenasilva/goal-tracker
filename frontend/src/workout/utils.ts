@@ -62,8 +62,6 @@ export function generateDaylogCommands(sets: WorkoutSet[]): string {
     lines.push(`pnpm run log exercise ${name} ${notation}`);
   }
 
-  lines.push('pnpm run log type lifting');
-
   return lines.join('\n');
 }
 
