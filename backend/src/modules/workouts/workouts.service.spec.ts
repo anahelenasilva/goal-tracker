@@ -52,7 +52,6 @@ const makeSet = (overrides: Partial<WorkoutSet> = {}): WorkoutSet => ({
   reps: 10,
   sets: 1,
   weight: 100,
-  weightUnit: 'kg',
   notes: null,
   createdAt: new Date(),
   session: makeSession(),
@@ -260,7 +259,6 @@ describe('WorkoutsService', () => {
           exerciseId: EXERCISE_ID,
           reps: 10,
           weight: 100,
-          weightUnit: 'kg',
         });
 
         expect(result).toEqual(setWithExercise);
@@ -286,7 +284,6 @@ describe('WorkoutsService', () => {
           exerciseId: EXERCISE_ID,
           reps: 12,
           weight: null,
-          weightUnit: 'kg',
         });
 
         expect(result.weight).toBeNull();
@@ -295,7 +292,6 @@ describe('WorkoutsService', () => {
             exerciseId: EXERCISE_ID,
             reps: 12,
             weight: null,
-            weightUnit: 'kg',
           }),
         );
       });
@@ -308,7 +304,6 @@ describe('WorkoutsService', () => {
             exerciseId: EXERCISE_ID,
             reps: 10,
             weight: 100,
-            weightUnit: 'kg',
           }),
         ).rejects.toThrow(NotFoundException);
       });
@@ -323,7 +318,6 @@ describe('WorkoutsService', () => {
             exerciseId: EXERCISE_ID,
             reps: 10,
             weight: 100,
-            weightUnit: 'kg',
           }),
         ).rejects.toThrow(ConflictException);
       });
@@ -338,7 +332,6 @@ describe('WorkoutsService', () => {
           exerciseId: EXERCISE_ID,
           reps: 10,
           weight: 100,
-          weightUnit: 'kg',
         });
 
         await expect(addSetPromise).rejects.toThrow(ConflictException);
@@ -355,7 +348,6 @@ describe('WorkoutsService', () => {
             exerciseId: 'non-existent',
             reps: 10,
             weight: 100,
-            weightUnit: 'kg',
           }),
         ).rejects.toThrow(NotFoundException);
       });
