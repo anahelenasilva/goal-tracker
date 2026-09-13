@@ -367,6 +367,21 @@ PORT=3005
 - Backend: Change `PORT` in backend `.env`
 - Frontend: Vite will automatically try the next available port
 
+### Host Not Allowed (403)
+
+Vite answers 403 ("Blocked request. This host is not allowed") to any hostname
+it doesn't know. IPs and localhost always work. To reach the app by name (like
+`http://anaspi.local:3006`), list the names in `ALLOWED_HOSTS` wherever
+`vite preview` runs. The names live there instead of in `vite.config.ts`
+because this repo is public.
+
+For a systemd unit, run `sudo systemctl edit <unit>`, add this, then restart it:
+
+```ini
+[Service]
+Environment=ALLOWED_HOSTS=anaspi.local,anaspi.<tailnet>.ts.net
+```
+
 ### CORS Issues
 
 - Backend CORS is configured for `http://localhost:5173`
