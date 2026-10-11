@@ -84,9 +84,11 @@ export function Dashboard() {
         <Timeline ref={timelineRef} />
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {goals.map((goal) => (
-            <GoalColumn key={goal.id} goal={goal} onEntryAdded={handleEntryAdded} />
-          ))}
+          {[...goals]
+            .sort((a, b) => Number(b.type === 'exercise') - Number(a.type === 'exercise'))
+            .map((goal) => (
+              <GoalColumn key={goal.id} goal={goal} onEntryAdded={handleEntryAdded} />
+            ))}
         </div>
       </div>
     </div>
